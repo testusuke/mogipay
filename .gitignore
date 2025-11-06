@@ -1,0 +1,22 @@
+# tmp
+tmp/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.env
+.env*
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
