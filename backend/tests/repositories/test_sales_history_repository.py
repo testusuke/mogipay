@@ -2,7 +2,7 @@
 
 import pytest
 from decimal import Decimal
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 from app.models import Product, SalesHistory, SaleItem
 from app.repositories.sales_history_repository import SalesHistoryRepository
@@ -122,7 +122,7 @@ class TestSalesHistoryRepository:
         repo.create_sale(Decimal("400.00"), sale_items_data, db=db_session)
 
         # Get sales by date range
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         start_date = now - timedelta(days=1)
         end_date = now + timedelta(days=1)
 
@@ -196,7 +196,7 @@ class TestSalesHistoryRepository:
         # Get daily sales
         daily_sales = repo.get_daily_sales(db=db_session)
         assert len(daily_sales) >= 1
-        today = datetime.utcnow().date()
+        today = datetime.now(UTC).date()
         for date, amount in daily_sales:
             if date == today:
                 assert amount == Decimal("500.00")
