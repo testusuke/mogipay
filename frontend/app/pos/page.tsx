@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Plus, Minus, ShoppingCart } from "lucide-react";
 import { apiClient } from "@/lib/api";
 import type { Product } from "@/lib/api/types";
-import { ApiError } from "@/lib/api/errors";
+import { ApiClientError, InsufficientStockError } from "@/lib/api/errors";
 
 interface CartItem {
   productId: string;
@@ -143,16 +143,14 @@ export default function POSScreen() {
     } catch (err) {
       console.error("Checkout failed:", err);
 
-      if (err instanceof ApiError) {
-        if (err.code === "INSUFFICIENT_STOCK") {
-          setError(
-            `在庫不足: ${err.message}\n` +
-            `要求数量: ${err.details?.requested || "N/A"}\n` +
-            `利用可能数量: ${err.details?.available || "N/A"}`
-          );
-        } else {
-          setError(`エラー: ${err.message}`);
-        }
+      if (err instanceof InsufficientStockError) {
+        setError(
+          `在庫不足: ${err.message}\n` +
+          `要求数量: ${err.details?.requested || "N/A"}\n` +
+          `利用可能数量: ${err.details?.available || "N/A"}`
+        );
+      } else if (err instanceof ApiClientError) {
+        setError(`エラー: ${err.message}`);
       } else {
         setError("精算処理に失敗しました");
       }
