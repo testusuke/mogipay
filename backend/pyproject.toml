@@ -1,0 +1,22 @@
+[project]
+name = "mogipay-backend"
+version = "0.1.0"
+description = "MogiPay Backend - FastAPI-based POS system for school festival vendors"
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.17.1",
+    "fastapi>=0.121.0",
+    "psycopg2-binary>=2.9.11",
+    "sqlalchemy>=2.0.44",
+    "uvicorn[standard]>=0.38.0",
+]
+
+[dependency-groups]
+dev = [
+    "faker>=37.12.0",
+    "httpx>=0.28.1",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "testcontainers>=4.13.2",
+]
