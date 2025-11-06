@@ -8,7 +8,6 @@ This module tests the HTTP layer for inventory management:
 """
 
 import pytest
-from decimal import Decimal
 from uuid import uuid4
 from unittest.mock import Mock
 from fastapi.testclient import TestClient

@@ -9,7 +9,6 @@ from pathlib import Path
 # Add parent directory to path to import app modules
 sys.path.append(str(Path(__file__).parent.parent))
 
-from decimal import Decimal
 from app.database import SessionLocal
 from app.models import Product, SetItem
 
@@ -37,48 +36,48 @@ def create_single_products(db):
         # 焼き串単品
         {
             "name": "ねぎま串",
-            "unit_cost": Decimal("80"),
-            "sale_price": Decimal("150"),
+            "unit_cost": 80,
+            "sale_price": 150,
             "initial_stock": 100,
             "current_stock": 100,
             "product_type": "single",
         },
         {
             "name": "つくね串",
-            "unit_cost": Decimal("70"),
-            "sale_price": Decimal("140"),
+            "unit_cost": 70,
+            "sale_price": 140,
             "initial_stock": 100,
             "current_stock": 100,
             "product_type": "single",
         },
         {
             "name": "豚バラ串",
-            "unit_cost": Decimal("90"),
-            "sale_price": Decimal("160"),
+            "unit_cost": 90,
+            "sale_price": 160,
             "initial_stock": 80,
             "current_stock": 80,
             "product_type": "single",
         },
         {
             "name": "鶏もも串",
-            "unit_cost": Decimal("85"),
-            "sale_price": Decimal("150"),
+            "unit_cost": 85,
+            "sale_price": 150,
             "initial_stock": 100,
             "current_stock": 100,
             "product_type": "single",
         },
         {
             "name": "牛串",
-            "unit_cost": Decimal("150"),
-            "sale_price": Decimal("250"),
+            "unit_cost": 150,
+            "sale_price": 250,
             "initial_stock": 50,
             "current_stock": 50,
             "product_type": "single",
         },
         {
             "name": "野菜串",
-            "unit_cost": Decimal("50"),
-            "sale_price": Decimal("100"),
+            "unit_cost": 50,
+            "sale_price": 100,
             "initial_stock": 60,
             "current_stock": 60,
             "product_type": "single",
@@ -86,24 +85,24 @@ def create_single_products(db):
         # ドリンク
         {
             "name": "お茶",
-            "unit_cost": Decimal("30"),
-            "sale_price": Decimal("100"),
+            "unit_cost": 30,
+            "sale_price": 100,
             "initial_stock": 150,
             "current_stock": 150,
             "product_type": "single",
         },
         {
             "name": "コーラ",
-            "unit_cost": Decimal("50"),
-            "sale_price": Decimal("150"),
+            "unit_cost": 50,
+            "sale_price": 150,
             "initial_stock": 100,
             "current_stock": 100,
             "product_type": "single",
         },
         {
             "name": "オレンジジュース",
-            "unit_cost": Decimal("50"),
-            "sale_price": Decimal("150"),
+            "unit_cost": 50,
+            "sale_price": 150,
             "initial_stock": 100,
             "current_stock": 100,
             "product_type": "single",
@@ -111,16 +110,16 @@ def create_single_products(db):
         # サイドメニュー
         {
             "name": "枝豆",
-            "unit_cost": Decimal("80"),
-            "sale_price": Decimal("200"),
+            "unit_cost": 80,
+            "sale_price": 200,
             "initial_stock": 50,
             "current_stock": 50,
             "product_type": "single",
         },
         {
             "name": "キャベツ",
-            "unit_cost": Decimal("60"),
-            "sale_price": Decimal("150"),
+            "unit_cost": 60,
+            "sale_price": 150,
             "initial_stock": 50,
             "current_stock": 50,
             "product_type": "single",
@@ -149,8 +148,8 @@ def create_set_products(db, single_products):
     # 串盛り合わせセット (5本セット)
     set_product_1 = Product(
         name="串盛り合わせセット",
-        unit_cost=Decimal("400"),
-        sale_price=Decimal("650"),
+        unit_cost=400,
+        sale_price=650,
         initial_stock=0,  # セット商品は仮想在庫
         current_stock=0,
         product_type="set",
@@ -194,8 +193,8 @@ def create_set_products(db, single_products):
     # 串ドリンクセット
     set_product_2 = Product(
         name="串ドリンクセット",
-        unit_cost=Decimal("130"),
-        sale_price=Decimal("250"),
+        unit_cost=130,
+        sale_price=250,
         initial_stock=0,
         current_stock=0,
         product_type="set",
@@ -224,8 +223,8 @@ def create_set_products(db, single_products):
     # 豪華串セット
     set_product_3 = Product(
         name="豪華串セット",
-        unit_cost=Decimal("500"),
-        sale_price=Decimal("800"),
+        unit_cost=500,
+        sale_price=800,
         initial_stock=0,
         current_stock=0,
         product_type="set",

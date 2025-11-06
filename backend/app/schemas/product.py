@@ -6,7 +6,6 @@ This module defines Pydantic models for product API requests and responses:
 - Data transfer objects
 """
 
-from decimal import Decimal
 from typing import Optional, List, Literal
 from uuid import UUID
 from datetime import datetime
@@ -38,8 +37,8 @@ class CreateProductRequest(BaseModel):
     """
 
     name: str = Field(..., min_length=1, max_length=255, description="Product name")
-    unit_cost: Decimal = Field(..., ge=0, description="Unit cost (purchase price)")
-    sale_price: Decimal = Field(..., ge=0, description="Sale price (selling price)")
+    unit_cost: int = Field(..., ge=0, description="Unit cost (purchase price)")
+    sale_price: int = Field(..., ge=0, description="Sale price (selling price)")
     initial_stock: int = Field(..., ge=0, description="Initial stock quantity")
     product_type: Literal["single", "set"] = Field(..., description="Product type")
     set_items: Optional[List[SetItemRequest]] = Field(
@@ -83,8 +82,8 @@ class UpdateProductRequest(BaseModel):
     """
 
     name: Optional[str] = Field(None, min_length=1, max_length=255)
-    unit_cost: Optional[Decimal] = Field(None, ge=0)
-    sale_price: Optional[Decimal] = Field(None, ge=0)
+    unit_cost: Optional[int] = Field(None, ge=0)
+    sale_price: Optional[int] = Field(None, ge=0)
 
 
 class UpdatePriceRequest(BaseModel):
@@ -94,7 +93,7 @@ class UpdatePriceRequest(BaseModel):
         sale_price: New sale price
     """
 
-    sale_price: Decimal = Field(..., ge=0, description="New sale price")
+    sale_price: int = Field(..., ge=0, description="New sale price")
 
 
 class SetItemResponse(BaseModel):
@@ -131,8 +130,8 @@ class ProductResponse(BaseModel):
 
     id: UUID
     name: str
-    unit_cost: Decimal
-    sale_price: Decimal
+    unit_cost: int
+    sale_price: int
     initial_stock: int
     current_stock: int
     product_type: Literal["single", "set"]

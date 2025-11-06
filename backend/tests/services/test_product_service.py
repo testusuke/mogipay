@@ -1,7 +1,7 @@
 """Tests for ProductService using TDD approach."""
 
 import pytest
-from decimal import Decimal
+
 from unittest.mock import Mock
 from uuid import uuid4
 
@@ -53,8 +53,8 @@ class TestProductService:
         """Test creating a single product."""
         product_data = CreateProductData(
             name="からあげ弁当",
-            unit_cost=Decimal("300"),
-            sale_price=Decimal("500"),
+            unit_cost=300,
+            sale_price=500,
             initial_stock=20,
             product_type="single",
             set_items=None,
@@ -63,8 +63,8 @@ class TestProductService:
         created_product = Product(
             id=uuid4(),
             name="からあげ弁当",
-            unit_cost=Decimal("300"),
-            sale_price=Decimal("500"),
+            unit_cost=300,
+            sale_price=500,
             initial_stock=20,
             current_stock=20,
             product_type="single",
@@ -88,8 +88,8 @@ class TestProductService:
 
         product_data = CreateProductData(
             name="からあげ弁当セット",
-            unit_cost=Decimal("500"),
-            sale_price=Decimal("800"),
+            unit_cost=500,
+            sale_price=800,
             initial_stock=0,
             product_type="set",
             set_items=[
@@ -101,8 +101,8 @@ class TestProductService:
         created_product = Product(
             id=uuid4(),
             name="からあげ弁当セット",
-            unit_cost=Decimal("500"),
-            sale_price=Decimal("800"),
+            unit_cost=500,
+            sale_price=800,
             initial_stock=0,
             current_stock=0,
             product_type="set",
@@ -124,8 +124,8 @@ class TestProductService:
         """Test that set product without set_items raises error."""
         product_data = CreateProductData(
             name="からあげ弁当セット",
-            unit_cost=Decimal("500"),
-            sale_price=Decimal("800"),
+            unit_cost=500,
+            sale_price=800,
             initial_stock=0,
             product_type="set",
             set_items=None,  # Missing set items
@@ -149,27 +149,27 @@ class TestProductService:
         original_product = Product(
             id=product_id,
             name="からあげ弁当",
-            sale_price=Decimal("500"),
-            unit_cost=Decimal("300"),
+            sale_price=500,
+            unit_cost=300,
         )
 
         updated_product = Product(
             id=product_id,
             name="からあげ弁当",
-            sale_price=Decimal("600"),
-            unit_cost=Decimal("300"),
+            sale_price=600,
+            unit_cost=300,
         )
 
         mock_product_repo.get_by_id.return_value = original_product
         mock_product_repo.update.return_value = updated_product
 
         result = product_service.update_price(
-            product_id, Decimal("600"), mock_db
+            product_id, 600, mock_db
         )
 
-        assert result.sale_price == Decimal("600")
+        assert result.sale_price == 600
         mock_product_repo.update.assert_called_once_with(
-            product_id, {"sale_price": Decimal("600")}, mock_db
+            product_id, {"sale_price": 600}, mock_db
         )
 
     # Test 5: Update price for non-existent product
@@ -181,7 +181,7 @@ class TestProductService:
         mock_product_repo.get_by_id.return_value = None
 
         with pytest.raises(ValueError) as exc_info:
-            product_service.update_price(product_id, Decimal("600"), mock_db)
+            product_service.update_price(product_id, 600, mock_db)
 
         assert "not found" in str(exc_info.value).lower()
 
@@ -194,7 +194,7 @@ class TestProductService:
         product = Product(
             id=product_id,
             name="からあげ弁当",
-            sale_price=Decimal("500"),
+            sale_price=500,
             product_type="single",
         )
 
@@ -247,19 +247,19 @@ class TestProductService:
         product_id = uuid4()
         updates = {
             "name": "新からあげ弁当",
-            "sale_price": Decimal("550"),
+            "sale_price": 550,
         }
 
         original_product = Product(
             id=product_id,
             name="からあげ弁当",
-            sale_price=Decimal("500"),
+            sale_price=500,
         )
 
         updated_product = Product(
             id=product_id,
             name="新からあげ弁当",
-            sale_price=Decimal("550"),
+            sale_price=550,
         )
 
         mock_product_repo.get_by_id.return_value = original_product
@@ -268,7 +268,7 @@ class TestProductService:
         result = product_service.update_product(product_id, updates, mock_db)
 
         assert result.name == "新からあげ弁当"
-        assert result.sale_price == Decimal("550")
+        assert result.sale_price == 550
         mock_product_repo.update.assert_called_once_with(product_id, updates, mock_db)
 
     # Test 10: Delete product

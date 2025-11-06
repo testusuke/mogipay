@@ -8,7 +8,6 @@ This module tests the HTTP layer for sales management:
 """
 
 import pytest
-from decimal import Decimal
 from uuid import uuid4
 from datetime import datetime, UTC, timedelta
 from unittest.mock import Mock, MagicMock
@@ -84,7 +83,7 @@ def test_checkout_success(client, mock_sales_service):
     sale_id = uuid4()
     mock_sales_service.process_checkout.return_value = CheckoutResult(
         sale_id=sale_id,
-        total_amount=Decimal("1000.00"),
+        total_amount=1000,
         timestamp=datetime.now(UTC)
     )
 
@@ -99,7 +98,7 @@ def test_checkout_success(client, mock_sales_service):
     assert response.status_code == 200
     data = response.json()
     assert data["sale_id"] == str(sale_id)
-    assert data["total_amount"] == "1000.00"
+    assert data["total_amount"] == "1000"
     assert "timestamp" in data
 
 
@@ -205,13 +204,13 @@ def test_get_sales_history_all(client, mock_sales_history_service):
     mock_sale_item.product_id = product_id
     mock_sale_item.product_name = "Test Product"
     mock_sale_item.quantity = 3
-    mock_sale_item.unit_cost = Decimal("300.00")
-    mock_sale_item.sale_price = Decimal("500.00")
-    mock_sale_item.subtotal = Decimal("1500.00")
+    mock_sale_item.unit_cost = 300
+    mock_sale_item.sale_price = 500
+    mock_sale_item.subtotal = 1500
 
     mock_sale = Mock()
     mock_sale.id = sale_id
-    mock_sale.total_amount = Decimal("1500.00")
+    mock_sale.total_amount = 1500
     mock_sale.timestamp = datetime.now(UTC)
     mock_sale.sale_items = [mock_sale_item]
 
@@ -225,7 +224,7 @@ def test_get_sales_history_all(client, mock_sales_history_service):
     data = response.json()
     assert len(data) == 1
     assert data[0]["sale_id"] == str(sale_id)
-    assert data[0]["total_amount"] == "1500.00"
+    assert data[0]["total_amount"] == "1500"
     assert len(data[0]["items"]) == 1
 
 
@@ -260,8 +259,8 @@ def test_get_sales_summary(client, mock_sales_analytics_service):
     # Setup mock
     from app.services.sales_analytics_service import SalesSummary
     mock_sales_analytics_service.get_sales_summary.return_value = SalesSummary(
-        total_revenue=Decimal("5000.00"),
-        daily_revenue=[Decimal("2000.00"), Decimal("3000.00")],
+        total_revenue=5000,
+        daily_revenue=[2000, 3000],
         completion_rate=0.65
     )
 
@@ -271,10 +270,10 @@ def test_get_sales_summary(client, mock_sales_analytics_service):
     # Assert
     assert response.status_code == 200
     data = response.json()
-    assert data["total_revenue"] == "5000.00"
+    assert data["total_revenue"] == "5000"
     assert len(data["daily_revenue"]) == 2
-    assert data["daily_revenue"][0] == "2000.00"
-    assert data["daily_revenue"][1] == "3000.00"
+    assert data["daily_revenue"][0] == "2000"
+    assert data["daily_revenue"][1] == "3000"
     assert data["completion_rate"] == 0.65
 
 
@@ -286,7 +285,7 @@ def test_get_sales_summary_no_sales(client, mock_sales_analytics_service):
     # Setup mock
     from app.services.sales_analytics_service import SalesSummary
     mock_sales_analytics_service.get_sales_summary.return_value = SalesSummary(
-        total_revenue=Decimal("0.00"),
+        total_revenue=0,
         daily_revenue=[],
         completion_rate=0.0
     )
@@ -297,6 +296,6 @@ def test_get_sales_summary_no_sales(client, mock_sales_analytics_service):
     # Assert
     assert response.status_code == 200
     data = response.json()
-    assert data["total_revenue"] == "0.00"
+    assert data["total_revenue"] == "0"
     assert len(data["daily_revenue"]) == 0
     assert data["completion_rate"] == 0.0

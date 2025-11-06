@@ -1,7 +1,6 @@
 """Tests for ProductRepository."""
 
 import pytest
-from decimal import Decimal
 from sqlalchemy.exc import IntegrityError
 import threading
 import time
@@ -18,8 +17,8 @@ class TestProductRepository:
         repo = ProductRepository()
         product = repo.create(
             name="からあげ弁当",
-            unit_cost=Decimal("300.00"),
-            sale_price=Decimal("500.00"),
+            unit_cost=300,
+            sale_price=500,
             initial_stock=10,
             current_stock=10,
             product_type="single",
@@ -28,8 +27,8 @@ class TestProductRepository:
 
         assert product.id is not None
         assert product.name == "からあげ弁当"
-        assert product.unit_cost == Decimal("300.00")
-        assert product.sale_price == Decimal("500.00")
+        assert product.unit_cost == 300
+        assert product.sale_price == 500
         assert product.initial_stock == 10
         assert product.current_stock == 10
         assert product.product_type == "single"
@@ -39,8 +38,8 @@ class TestProductRepository:
         repo = ProductRepository()
         created = repo.create(
             name="test product",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=5,
             current_stock=5,
             product_type="single",
@@ -64,8 +63,8 @@ class TestProductRepository:
         repo = ProductRepository()
         repo.create(
             name="product1",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=5,
             current_stock=5,
             product_type="single",
@@ -73,8 +72,8 @@ class TestProductRepository:
         )
         repo.create(
             name="product2",
-            unit_cost=Decimal("150.00"),
-            sale_price=Decimal("250.00"),
+            unit_cost=150,
+            sale_price=250,
             initial_stock=3,
             current_stock=3,
             product_type="set",
@@ -89,8 +88,8 @@ class TestProductRepository:
         repo = ProductRepository()
         repo.create(
             name="single product",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=5,
             current_stock=5,
             product_type="single",
@@ -98,8 +97,8 @@ class TestProductRepository:
         )
         repo.create(
             name="set product",
-            unit_cost=Decimal("150.00"),
-            sale_price=Decimal("250.00"),
+            unit_cost=150,
+            sale_price=250,
             initial_stock=3,
             current_stock=3,
             product_type="set",
@@ -115,8 +114,8 @@ class TestProductRepository:
         repo = ProductRepository()
         product = repo.create(
             name="original name",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=5,
             current_stock=5,
             product_type="single",
@@ -125,20 +124,20 @@ class TestProductRepository:
 
         updated = repo.update(
             product.id,
-            {"name": "updated name", "sale_price": Decimal("250.00")},
+            {"name": "updated name", "sale_price": 250},
             db=db_session
         )
 
         assert updated.name == "updated name"
-        assert updated.sale_price == Decimal("250.00")
+        assert updated.sale_price == 250
 
     def test_delete_product(self, db_session):
         """Test deleting a product."""
         repo = ProductRepository()
         product = repo.create(
             name="to be deleted",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=5,
             current_stock=5,
             product_type="single",
@@ -153,8 +152,8 @@ class TestProductRepository:
         repo = ProductRepository()
         product = repo.create(
             name="からあげ弁当",
-            unit_cost=Decimal("300.00"),
-            sale_price=Decimal("500.00"),
+            unit_cost=300,
+            sale_price=500,
             initial_stock=5,
             current_stock=5,
             product_type="single",
@@ -173,8 +172,8 @@ class TestProductRepository:
         repo = ProductRepository()
         product = repo.create(
             name="test",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=10,
             current_stock=10,
             product_type="single",

@@ -9,7 +9,7 @@ This module tests the HTTP layer for financial management:
 """
 
 import pytest
-from decimal import Decimal
+
 from unittest.mock import Mock
 from fastapi.testclient import TestClient
 
@@ -56,9 +56,9 @@ def test_get_financial_summary_profit(client, mock_financial_service):
 
     # Setup mock - break-even achieved (profit)
     mock_financial_service.get_financial_summary.return_value = FinancialSummary(
-        total_cost=Decimal("10000.00"),
-        total_revenue=Decimal("15000.00"),
-        profit=Decimal("5000.00"),
+        total_cost=10000,
+        total_revenue=15000,
+        profit=5000,
         profit_rate=0.5,
         break_even_achieved=True,
     )
@@ -69,9 +69,9 @@ def test_get_financial_summary_profit(client, mock_financial_service):
     # Assert
     assert response.status_code == 200
     data = response.json()
-    assert data["total_cost"] == "10000.00"
-    assert data["total_revenue"] == "15000.00"
-    assert data["profit"] == "5000.00"
+    assert data["total_cost"] == "10000"
+    assert data["total_revenue"] == "15000"
+    assert data["profit"] == "5000"
     assert data["profit_rate"] == 0.5
     assert data["break_even_achieved"] is True
 
@@ -83,9 +83,9 @@ def test_get_financial_summary_loss(client, mock_financial_service):
 
     # Setup mock - not break-even yet (loss)
     mock_financial_service.get_financial_summary.return_value = FinancialSummary(
-        total_cost=Decimal("10000.00"),
-        total_revenue=Decimal("7000.00"),
-        profit=Decimal("-3000.00"),
+        total_cost=10000,
+        total_revenue=7000,
+        profit=-3000,
         profit_rate=-0.3,
         break_even_achieved=False,
     )
@@ -96,9 +96,9 @@ def test_get_financial_summary_loss(client, mock_financial_service):
     # Assert
     assert response.status_code == 200
     data = response.json()
-    assert data["total_cost"] == "10000.00"
-    assert data["total_revenue"] == "7000.00"
-    assert data["profit"] == "-3000.00"
+    assert data["total_cost"] == "10000"
+    assert data["total_revenue"] == "7000"
+    assert data["profit"] == "-3000"
     assert data["profit_rate"] == -0.3
     assert data["break_even_achieved"] is False
 
@@ -110,9 +110,9 @@ def test_get_financial_summary_break_even(client, mock_financial_service):
 
     # Setup mock - exact break-even
     mock_financial_service.get_financial_summary.return_value = FinancialSummary(
-        total_cost=Decimal("10000.00"),
-        total_revenue=Decimal("10000.00"),
-        profit=Decimal("0.00"),
+        total_cost=10000,
+        total_revenue=10000,
+        profit=0,
         profit_rate=0.0,
         break_even_achieved=True,
     )
@@ -123,9 +123,9 @@ def test_get_financial_summary_break_even(client, mock_financial_service):
     # Assert
     assert response.status_code == 200
     data = response.json()
-    assert data["total_cost"] == "10000.00"
-    assert data["total_revenue"] == "10000.00"
-    assert data["profit"] == "0.00"
+    assert data["total_cost"] == "10000"
+    assert data["total_revenue"] == "10000"
+    assert data["profit"] == "0"
     assert data["profit_rate"] == 0.0
     assert data["break_even_achieved"] is True
 
@@ -137,9 +137,9 @@ def test_get_financial_summary_no_sales(client, mock_financial_service):
 
     # Setup mock - no sales yet
     mock_financial_service.get_financial_summary.return_value = FinancialSummary(
-        total_cost=Decimal("10000.00"),
-        total_revenue=Decimal("0.00"),
-        profit=Decimal("-10000.00"),
+        total_cost=10000,
+        total_revenue=0,
+        profit=-10000,
         profit_rate=-1.0,
         break_even_achieved=False,
     )
@@ -150,9 +150,9 @@ def test_get_financial_summary_no_sales(client, mock_financial_service):
     # Assert
     assert response.status_code == 200
     data = response.json()
-    assert data["total_cost"] == "10000.00"
-    assert data["total_revenue"] == "0.00"
-    assert data["profit"] == "-10000.00"
+    assert data["total_cost"] == "10000"
+    assert data["total_revenue"] == "0"
+    assert data["profit"] == "-10000"
     assert data["profit_rate"] == -1.0
     assert data["break_even_achieved"] is False
 
@@ -164,9 +164,9 @@ def test_get_financial_summary_zero_cost(client, mock_financial_service):
 
     # Setup mock - zero cost (all products are free)
     mock_financial_service.get_financial_summary.return_value = FinancialSummary(
-        total_cost=Decimal("0.00"),
-        total_revenue=Decimal("5000.00"),
-        profit=Decimal("5000.00"),
+        total_cost=0,
+        total_revenue=5000,
+        profit=5000,
         profit_rate=0.0,  # profit_rate is 0 when cost is 0
         break_even_achieved=True,
     )
@@ -177,7 +177,7 @@ def test_get_financial_summary_zero_cost(client, mock_financial_service):
     # Assert
     assert response.status_code == 200
     data = response.json()
-    assert data["total_cost"] == "0.00"
-    assert data["total_revenue"] == "5000.00"
-    assert data["profit"] == "5000.00"
+    assert data["total_cost"] == "0"
+    assert data["total_revenue"] == "5000"
+    assert data["profit"] == "5000"
     assert data["break_even_achieved"] is True

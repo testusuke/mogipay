@@ -2,8 +2,7 @@
 
 import uuid
 from datetime import datetime
-from decimal import Decimal
-from sqlalchemy import Column, String, Numeric, Integer, DateTime, CheckConstraint
+from sqlalchemy import Column, String, Integer, DateTime, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -29,8 +28,8 @@ class Product(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
-    unit_cost = Column(Numeric(10, 2), nullable=False)
-    sale_price = Column(Numeric(10, 2), nullable=False)
+    unit_cost = Column(Integer, nullable=False)
+    sale_price = Column(Integer, nullable=False)
     initial_stock = Column(Integer, nullable=False)
     current_stock = Column(Integer, nullable=False)
     product_type = Column(String(20), nullable=False)

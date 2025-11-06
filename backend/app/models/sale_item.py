@@ -1,7 +1,7 @@
 """SaleItem model for sale_items table."""
 
 import uuid
-from sqlalchemy import Column, String, Integer, Numeric, ForeignKey, CheckConstraint
+from sqlalchemy import Column, String, Integer, ForeignKey, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -29,9 +29,9 @@ class SaleItem(Base):
     product_id = Column(UUID(as_uuid=True), ForeignKey("products.id", ondelete="RESTRICT"), nullable=False)
     product_name = Column(String(255), nullable=False)
     quantity = Column(Integer, nullable=False)
-    unit_cost = Column(Numeric(10, 2), nullable=False)
-    sale_price = Column(Numeric(10, 2), nullable=False)
-    subtotal = Column(Numeric(10, 2), nullable=False)
+    unit_cost = Column(Integer, nullable=False)
+    sale_price = Column(Integer, nullable=False)
+    subtotal = Column(Integer, nullable=False)
 
     # Relationships
     sale = relationship("SalesHistory", back_populates="sale_items")

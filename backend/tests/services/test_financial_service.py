@@ -1,7 +1,7 @@
 """Tests for FinancialService using TDD approach."""
 
 import pytest
-from decimal import Decimal
+
 from unittest.mock import Mock
 from uuid import uuid4
 
@@ -61,25 +61,25 @@ class TestFinancialService:
             Product(
                 id=uuid4(),
                 name="からあげ弁当",
-                unit_cost=Decimal("300"),
+                unit_cost=300,
                 initial_stock=20,
             ),
             Product(
                 id=uuid4(),
                 name="焼きそば",
-                unit_cost=Decimal("200"),
+                unit_cost=200,
                 initial_stock=15,
             ),
         ]
 
         mock_product_repo.get_all.return_value = products
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("12000")
+        mock_sales_history_repo.get_total_sales.return_value = 12000
 
         result = financial_service.get_financial_summary(mock_db)
 
-        assert result.total_cost == Decimal("9000")
-        assert result.total_revenue == Decimal("12000")
-        assert result.profit == Decimal("3000")
+        assert result.total_cost == 9000
+        assert result.total_revenue == 12000
+        assert result.profit == 3000
         assert result.break_even_achieved is True
 
     # Test 2: Break-even not achieved
@@ -91,19 +91,19 @@ class TestFinancialService:
             Product(
                 id=uuid4(),
                 name="からあげ弁当",
-                unit_cost=Decimal("300"),
+                unit_cost=300,
                 initial_stock=20,
             ),
         ]
 
         mock_product_repo.get_all.return_value = products
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("5000")
+        mock_sales_history_repo.get_total_sales.return_value = 5000
 
         result = financial_service.get_financial_summary(mock_db)
 
-        assert result.total_cost == Decimal("6000")
-        assert result.total_revenue == Decimal("5000")
-        assert result.profit == Decimal("-1000")
+        assert result.total_cost == 6000
+        assert result.total_revenue == 5000
+        assert result.profit == -1000
         assert result.break_even_achieved is False
 
     # Test 3: Exactly break-even
@@ -115,19 +115,19 @@ class TestFinancialService:
             Product(
                 id=uuid4(),
                 name="からあげ弁当",
-                unit_cost=Decimal("300"),
+                unit_cost=300,
                 initial_stock=20,
             ),
         ]
 
         mock_product_repo.get_all.return_value = products
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("6000")
+        mock_sales_history_repo.get_total_sales.return_value = 6000
 
         result = financial_service.get_financial_summary(mock_db)
 
-        assert result.total_cost == Decimal("6000")
-        assert result.total_revenue == Decimal("6000")
-        assert result.profit == Decimal("0")
+        assert result.total_cost == 6000
+        assert result.total_revenue == 6000
+        assert result.profit == 0
         assert result.break_even_achieved is True
 
     # Test 4: Profit rate calculation
@@ -145,13 +145,13 @@ class TestFinancialService:
             Product(
                 id=uuid4(),
                 name="test",
-                unit_cost=Decimal("500"),
+                unit_cost=500,
                 initial_stock=20,
             ),
         ]
 
         mock_product_repo.get_all.return_value = products
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("15000")
+        mock_sales_history_repo.get_total_sales.return_value = 15000
 
         result = financial_service.get_financial_summary(mock_db)
 
@@ -167,19 +167,19 @@ class TestFinancialService:
             Product(
                 id=uuid4(),
                 name="からあげ弁当",
-                unit_cost=Decimal("300"),
+                unit_cost=300,
                 initial_stock=20,
             ),
         ]
 
         mock_product_repo.get_all.return_value = products
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("0")
+        mock_sales_history_repo.get_total_sales.return_value = 0
 
         result = financial_service.get_financial_summary(mock_db)
 
-        assert result.total_cost == Decimal("6000")
-        assert result.total_revenue == Decimal("0")
-        assert result.profit == Decimal("-6000")
+        assert result.total_cost == 6000
+        assert result.total_revenue == 0
+        assert result.profit == -6000
         assert result.profit_rate == 0.0  # Avoid division by zero
         assert result.break_even_achieved is False
 
@@ -192,32 +192,32 @@ class TestFinancialService:
             Product(
                 id=uuid4(),
                 name="からあげ弁当",
-                unit_cost=Decimal("300"),
+                unit_cost=300,
                 initial_stock=20,
             ),
             Product(
                 id=uuid4(),
                 name="焼きそば",
-                unit_cost=Decimal("200"),
+                unit_cost=200,
                 initial_stock=15,
             ),
             Product(
                 id=uuid4(),
                 name="セット",
-                unit_cost=Decimal("500"),
+                unit_cost=500,
                 initial_stock=10,
             ),
         ]
 
         mock_product_repo.get_all.return_value = products
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("20000")
+        mock_sales_history_repo.get_total_sales.return_value = 20000
 
         result = financial_service.get_financial_summary(mock_db)
 
         # Total cost = 20*300 + 15*200 + 10*500 = 6000 + 3000 + 5000 = 14000
-        assert result.total_cost == Decimal("14000")
-        assert result.total_revenue == Decimal("20000")
-        assert result.profit == Decimal("6000")
+        assert result.total_cost == 14000
+        assert result.total_revenue == 20000
+        assert result.profit == 6000
         assert result.break_even_achieved is True
 
     # Test 7: Empty products list
@@ -226,12 +226,12 @@ class TestFinancialService:
     ):
         """Test financial summary with no products."""
         mock_product_repo.get_all.return_value = []
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("0")
+        mock_sales_history_repo.get_total_sales.return_value = 0
 
         result = financial_service.get_financial_summary(mock_db)
 
-        assert result.total_cost == Decimal("0")
-        assert result.total_revenue == Decimal("0")
-        assert result.profit == Decimal("0")
+        assert result.total_cost == 0
+        assert result.total_revenue == 0
+        assert result.profit == 0
         assert result.profit_rate == 0.0
         assert result.break_even_achieved is True  # 0 >= 0

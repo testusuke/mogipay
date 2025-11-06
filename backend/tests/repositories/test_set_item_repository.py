@@ -1,7 +1,6 @@
 """Tests for SetItemRepository."""
 
 import pytest
-from decimal import Decimal
 from sqlalchemy.exc import IntegrityError
 
 from app.models import Product, SetItem
@@ -18,8 +17,8 @@ class TestSetItemRepository:
         product_repo = ProductRepository()
         set_product = product_repo.create(
             name="Bento Set",
-            unit_cost=Decimal("500.00"),
-            sale_price=Decimal("800.00"),
+            unit_cost=500,
+            sale_price=800,
             initial_stock=5,
             current_stock=5,
             product_type="set",
@@ -27,8 +26,8 @@ class TestSetItemRepository:
         )
         item_product = product_repo.create(
             name="Karaage",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=20,
             current_stock=20,
             product_type="single",
@@ -55,8 +54,8 @@ class TestSetItemRepository:
         product_repo = ProductRepository()
         set_product = product_repo.create(
             name="Bento Set",
-            unit_cost=Decimal("500.00"),
-            sale_price=Decimal("800.00"),
+            unit_cost=500,
+            sale_price=800,
             initial_stock=5,
             current_stock=5,
             product_type="set",
@@ -64,8 +63,8 @@ class TestSetItemRepository:
         )
         item1 = product_repo.create(
             name="Karaage",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=20,
             current_stock=20,
             product_type="single",
@@ -73,8 +72,8 @@ class TestSetItemRepository:
         )
         item2 = product_repo.create(
             name="Rice",
-            unit_cost=Decimal("50.00"),
-            sale_price=Decimal("100.00"),
+            unit_cost=50,
+            sale_price=100,
             initial_stock=30,
             current_stock=30,
             product_type="single",
@@ -96,8 +95,8 @@ class TestSetItemRepository:
         product_repo = ProductRepository()
         set_product = product_repo.create(
             name="Bento Set",
-            unit_cost=Decimal("500.00"),
-            sale_price=Decimal("800.00"),
+            unit_cost=500,
+            sale_price=800,
             initial_stock=5,
             current_stock=5,
             product_type="set",
@@ -105,8 +104,8 @@ class TestSetItemRepository:
         )
         item1 = product_repo.create(
             name="Karaage",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=20,
             current_stock=20,
             product_type="single",
@@ -114,8 +113,8 @@ class TestSetItemRepository:
         )
         item2 = product_repo.create(
             name="Rice",
-            unit_cost=Decimal("50.00"),
-            sale_price=Decimal("100.00"),
+            unit_cost=50,
+            sale_price=100,
             initial_stock=30,
             current_stock=30,
             product_type="single",
@@ -140,8 +139,8 @@ class TestSetItemRepository:
         product_repo = ProductRepository()
         set_product = product_repo.create(
             name="Bento Set",
-            unit_cost=Decimal("500.00"),
-            sale_price=Decimal("800.00"),
+            unit_cost=500,
+            sale_price=800,
             initial_stock=5,
             current_stock=5,
             product_type="set",
@@ -149,8 +148,8 @@ class TestSetItemRepository:
         )
         item1 = product_repo.create(
             name="Karaage",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=20,
             current_stock=20,
             product_type="single",
@@ -158,8 +157,8 @@ class TestSetItemRepository:
         )
         item2 = product_repo.create(
             name="Rice",
-            unit_cost=Decimal("50.00"),
-            sale_price=Decimal("100.00"),
+            unit_cost=50,
+            sale_price=100,
             initial_stock=30,
             current_stock=30,
             product_type="single",
@@ -185,8 +184,8 @@ class TestSetItemRepository:
         product_repo = ProductRepository()
         set_product = product_repo.create(
             name="Bento Set",
-            unit_cost=Decimal("500.00"),
-            sale_price=Decimal("800.00"),
+            unit_cost=500,
+            sale_price=800,
             initial_stock=5,
             current_stock=5,
             product_type="set",
@@ -194,8 +193,8 @@ class TestSetItemRepository:
         )
         item_product = product_repo.create(
             name="Karaage",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=20,
             current_stock=20,
             product_type="single",
@@ -225,8 +224,8 @@ class TestSetItemRepository:
         product_repo = ProductRepository()
         set_product = product_repo.create(
             name="Bento Set",
-            unit_cost=Decimal("500.00"),
-            sale_price=Decimal("800.00"),
+            unit_cost=500,
+            sale_price=800,
             initial_stock=5,
             current_stock=5,
             product_type="set",
@@ -234,8 +233,8 @@ class TestSetItemRepository:
         )
         item_product = product_repo.create(
             name="Karaage",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=20,
             current_stock=20,
             product_type="single",

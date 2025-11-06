@@ -35,7 +35,7 @@ def test_full_sales_flow(client):
     })
     assert response.status_code == 200, f"Checkout failed: {response.json()}"
     sale_data = response.json()
-    assert float(sale_data["total_amount"]) == 1500  # 500 * 3
+    assert sale_data["total_amount"] == 1500  # 500 * 3
 
     # Step 3: Verify inventory (10 - 3 = 7)
     response = client.get("/api/inventory/status")
@@ -50,7 +50,7 @@ def test_full_sales_flow(client):
     assert response.status_code == 200
     history = response.json()
     assert len(history) == 1
-    assert float(history[0]["total_amount"]) == 1500
+    assert history[0]["total_amount"] == 1500
     assert len(history[0]["items"]) == 1
     assert history[0]["items"][0]["product_name"] == "からあげ弁当"
     assert history[0]["items"][0]["quantity"] == 3
@@ -116,21 +116,21 @@ def test_multiple_sales_flow(client):
         "items": [{"product_id": product_id, "quantity": 5}]
     })
     assert response.status_code == 200
-    assert float(response.json()["total_amount"]) == 2000  # 400 * 5
+    assert response.json(["total_amount"]) == 2000  # 400 * 5
 
     # Second sale: 3 items
     response = client.post("/api/sales/checkout", json={
         "items": [{"product_id": product_id, "quantity": 3}]
     })
     assert response.status_code == 200
-    assert float(response.json()["total_amount"]) == 1200  # 400 * 3
+    assert response.json(["total_amount"]) == 1200  # 400 * 3
 
     # Third sale: 7 items
     response = client.post("/api/sales/checkout", json={
         "items": [{"product_id": product_id, "quantity": 7}]
     })
     assert response.status_code == 200
-    assert float(response.json()["total_amount"]) == 2800  # 400 * 7
+    assert response.json(["total_amount"]) == 2800  # 400 * 7
 
     # Verify inventory (20 - 5 - 3 - 7 = 5)
     response = client.get("/api/inventory/status")
@@ -142,7 +142,7 @@ def test_multiple_sales_flow(client):
     response = client.get("/api/sales/history")
     history = response.json()
     assert len(history) == 3
-    total_revenue = sum(float(sale["total_amount"]) for sale in history)
+    total_revenue = sum(sale["total_amount"] for sale in history)
     assert total_revenue == 6000  # 2000 + 1200 + 2800
 
 
@@ -166,9 +166,9 @@ def test_financial_summary_after_sales(client):
     response = client.get("/api/financial/summary")
     assert response.status_code == 200
     summary = response.json()
-    assert float(summary["total_cost"]) == 1500  # 150 * 10
-    assert float(summary["total_revenue"]) == 0
-    assert float(summary["profit"]) == -1500
+    assert summary["total_cost"] == 1500  # 150 * 10
+    assert summary["total_revenue"] == 0
+    assert summary["profit"] == -1500
     assert summary["break_even_achieved"] is False
 
     # Make a sale: 6 items
@@ -180,9 +180,9 @@ def test_financial_summary_after_sales(client):
     # Financial summary after first sale
     response = client.get("/api/financial/summary")
     summary = response.json()
-    assert float(summary["total_cost"]) == 1500
-    assert float(summary["total_revenue"]) == 1800  # 300 * 6
-    assert float(summary["profit"]) == 300  # 1800 - 1500
+    assert summary["total_cost"] == 1500
+    assert summary["total_revenue"] == 1800  # 300 * 6
+    assert summary["profit"] == 300  # 1800 - 1500
     assert summary["break_even_achieved"] is True  # Profit >= 0
 
 
@@ -217,5 +217,5 @@ def test_sales_analytics_after_sales(client):
     response = client.get("/api/sales/summary")
     assert response.status_code == 200
     summary = response.json()
-    assert float(summary["total_revenue"]) == 7500  # 250 * 30
+    assert summary["total_revenue"] == 7500  # 250 * 30
     assert summary["completion_rate"] == pytest.approx(0.6, rel=0.01)  # (50-20)/50 = 0.6 (60%)

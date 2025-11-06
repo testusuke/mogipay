@@ -1,7 +1,6 @@
 """Tests for SalesHistoryRepository."""
 
 import pytest
-from decimal import Decimal
 from datetime import datetime, timedelta, UTC
 
 from app.models import Product, SalesHistory, SaleItem
@@ -18,8 +17,8 @@ class TestSalesHistoryRepository:
         product_repo = ProductRepository()
         product = product_repo.create(
             name="Karaage Bento",
-            unit_cost=Decimal("300.00"),
-            sale_price=Decimal("500.00"),
+            unit_cost=300,
+            sale_price=500,
             initial_stock=10,
             current_stock=10,
             product_type="single",
@@ -39,18 +38,18 @@ class TestSalesHistoryRepository:
             }
         ]
         sales = repo.create_sale(
-            total_amount=Decimal("1000.00"),
+            total_amount=1000,
             sale_items_data=sale_items_data,
             db=db_session
         )
 
         assert sales.id is not None
-        assert sales.total_amount == Decimal("1000.00")
+        assert sales.total_amount == 1000
         assert sales.timestamp is not None
         assert len(sales.sale_items) == 1
         assert sales.sale_items[0].product_name == "Karaage Bento"
         assert sales.sale_items[0].quantity == 2
-        assert sales.sale_items[0].subtotal == Decimal("1000.00")
+        assert sales.sale_items[0].subtotal == 1000
 
     def test_get_by_id(self, db_session):
         """Test retrieving a sales transaction by ID."""
@@ -58,8 +57,8 @@ class TestSalesHistoryRepository:
         product_repo = ProductRepository()
         product = product_repo.create(
             name="Test Product",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=10,
             current_stock=10,
             product_type="single",
@@ -78,7 +77,7 @@ class TestSalesHistoryRepository:
             }
         ]
         created = repo.create_sale(
-            total_amount=Decimal("200.00"),
+            total_amount=200,
             sale_items_data=sale_items_data,
             db=db_session
         )
@@ -87,7 +86,7 @@ class TestSalesHistoryRepository:
         retrieved = repo.get_by_id(created.id, db=db_session)
         assert retrieved is not None
         assert retrieved.id == created.id
-        assert retrieved.total_amount == Decimal("200.00")
+        assert retrieved.total_amount == 200
         assert len(retrieved.sale_items) == 1
 
     def test_get_by_date_range(self, db_session):
@@ -96,8 +95,8 @@ class TestSalesHistoryRepository:
         product_repo = ProductRepository()
         product = product_repo.create(
             name="Test Product",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=10,
             current_stock=10,
             product_type="single",
@@ -117,9 +116,9 @@ class TestSalesHistoryRepository:
         ]
 
         # Create multiple sales
-        repo.create_sale(Decimal("200.00"), sale_items_data, db=db_session)
-        repo.create_sale(Decimal("300.00"), sale_items_data, db=db_session)
-        repo.create_sale(Decimal("400.00"), sale_items_data, db=db_session)
+        repo.create_sale(200, sale_items_data, db=db_session)
+        repo.create_sale(300, sale_items_data, db=db_session)
+        repo.create_sale(400, sale_items_data, db=db_session)
 
         # Get sales by date range
         now = datetime.now(UTC)
@@ -135,8 +134,8 @@ class TestSalesHistoryRepository:
         product_repo = ProductRepository()
         product = product_repo.create(
             name="Test Product",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=10,
             current_stock=10,
             product_type="single",
@@ -156,12 +155,12 @@ class TestSalesHistoryRepository:
         ]
 
         # Create sales
-        repo.create_sale(Decimal("200.00"), sale_items_data, db=db_session)
-        repo.create_sale(Decimal("300.00"), sale_items_data, db=db_session)
+        repo.create_sale(200, sale_items_data, db=db_session)
+        repo.create_sale(300, sale_items_data, db=db_session)
 
         # Get total sales
         total = repo.get_total_sales(db=db_session)
-        assert total == Decimal("500.00")
+        assert total == 500
 
     def test_get_daily_sales(self, db_session):
         """Test getting daily sales summary."""
@@ -169,8 +168,8 @@ class TestSalesHistoryRepository:
         product_repo = ProductRepository()
         product = product_repo.create(
             name="Test Product",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=10,
             current_stock=10,
             product_type="single",
@@ -190,8 +189,8 @@ class TestSalesHistoryRepository:
         ]
 
         # Create sales
-        repo.create_sale(Decimal("200.00"), sale_items_data, db=db_session)
-        repo.create_sale(Decimal("300.00"), sale_items_data, db=db_session)
+        repo.create_sale(200, sale_items_data, db=db_session)
+        repo.create_sale(300, sale_items_data, db=db_session)
 
         # Get daily sales
         daily_sales = repo.get_daily_sales(db=db_session)
@@ -199,7 +198,7 @@ class TestSalesHistoryRepository:
         today = datetime.now(UTC).date()
         for date, amount in daily_sales:
             if date == today:
-                assert amount == Decimal("500.00")
+                assert amount == 500
 
     def test_price_snapshot_immutability(self, db_session):
         """Test that price changes don't affect past sales records."""
@@ -207,8 +206,8 @@ class TestSalesHistoryRepository:
         product_repo = ProductRepository()
         product = product_repo.create(
             name="Test Product",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=10,
             current_stock=10,
             product_type="single",
@@ -228,7 +227,7 @@ class TestSalesHistoryRepository:
             }
         ]
         original_sale = repo.create_sale(
-            Decimal("200.00"),
+            200,
             sale_items_data,
             db=db_session
         )
@@ -237,14 +236,14 @@ class TestSalesHistoryRepository:
         # Change product price
         product_repo.update(
             product.id,
-            {"sale_price": Decimal("300.00")},
+            {"sale_price": 300},
             db=db_session
         )
 
         # Verify original sale still has old price
         retrieved_sale = repo.get_by_id(original_sale_id, db=db_session)
-        assert retrieved_sale.sale_items[0].sale_price == Decimal("200.00")
-        assert retrieved_sale.total_amount == Decimal("200.00")
+        assert retrieved_sale.sale_items[0].sale_price == 200
+        assert retrieved_sale.total_amount == 200
 
     def test_cascade_delete_sale_items(self, db_session):
         """Test that sale items are deleted when sales history is deleted."""
@@ -252,8 +251,8 @@ class TestSalesHistoryRepository:
         product_repo = ProductRepository()
         product = product_repo.create(
             name="Test Product",
-            unit_cost=Decimal("100.00"),
-            sale_price=Decimal("200.00"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=10,
             current_stock=10,
             product_type="single",
@@ -272,7 +271,7 @@ class TestSalesHistoryRepository:
             }
         ]
         sales = repo.create_sale(
-            Decimal("200.00"),
+            200,
             sale_items_data,
             db=db_session
         )

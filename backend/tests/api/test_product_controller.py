@@ -9,7 +9,6 @@ This module tests the HTTP layer for product management:
 """
 
 import pytest
-from decimal import Decimal
 from uuid import uuid4
 from datetime import datetime, UTC
 from unittest.mock import Mock, MagicMock
@@ -60,8 +59,8 @@ def test_create_single_product_success(client, mock_product_service):
     mock_product = Product(
         id=uuid4(),
         name="からあげ弁当",
-        unit_cost=Decimal("300"),
-        sale_price=Decimal("500"),
+        unit_cost=300,
+        sale_price=500,
         initial_stock=10,
         current_stock=10,
         product_type="single",
@@ -98,8 +97,8 @@ def test_create_set_product_success(client, mock_product_service):
     mock_product = Product(
         id=uuid4(),
         name="からあげセット",
-        unit_cost=Decimal("500"),
-        sale_price=Decimal("800"),
+        unit_cost=500,
+        sale_price=800,
         initial_stock=0,
         current_stock=0,
         product_type="set",
@@ -179,8 +178,8 @@ def test_get_all_products(client, mock_product_service):
         Product(
             id=uuid4(),
             name="商品1",
-            unit_cost=Decimal("100"),
-            sale_price=Decimal("200"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=10,
             current_stock=8,
             product_type="single",
@@ -190,8 +189,8 @@ def test_get_all_products(client, mock_product_service):
         Product(
             id=uuid4(),
             name="商品2",
-            unit_cost=Decimal("200"),
-            sale_price=Decimal("300"),
+            unit_cost=200,
+            sale_price=300,
             initial_stock=5,
             current_stock=5,
             product_type="single",
@@ -220,8 +219,8 @@ def test_get_products_by_type(client, mock_product_service):
         Product(
             id=uuid4(),
             name="単品",
-            unit_cost=Decimal("100"),
-            sale_price=Decimal("200"),
+            unit_cost=100,
+            sale_price=200,
             initial_stock=10,
             current_stock=10,
             product_type="single",
@@ -250,8 +249,8 @@ def test_get_product_by_id(client, mock_product_service):
     mock_product = Product(
         id=product_id,
         name="test",
-        unit_cost=Decimal("100"),
-        sale_price=Decimal("200"),
+        unit_cost=100,
+        sale_price=200,
         initial_stock=10,
         current_stock=10,
         product_type="single",
@@ -296,8 +295,8 @@ def test_update_product_success(client, mock_product_service):
     mock_product = Product(
         id=product_id,
         name="updated",
-        unit_cost=Decimal("150"),
-        sale_price=Decimal("250"),
+        unit_cost=150,
+        sale_price=250,
         initial_stock=10,
         current_stock=10,
         product_type="single",
@@ -327,8 +326,8 @@ def test_update_price_success(client, mock_product_service):
     mock_product = Product(
         id=product_id,
         name="test",
-        unit_cost=Decimal("100"),
-        sale_price=Decimal("300"),  # Updated price
+        unit_cost=100,
+        sale_price=300,  # Updated price
         initial_stock=10,
         current_stock=10,
         product_type="single",
@@ -343,7 +342,7 @@ def test_update_price_success(client, mock_product_service):
 
     assert response.status_code == 200
     data = response.json()
-    assert float(data["sale_price"]) == 300.0
+    assert data["sale_price"] == 300
 
 
 # 🔴 RED: PUT /api/products/{id}/price - Product not found

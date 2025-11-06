@@ -1,7 +1,7 @@
 """Tests for SalesAnalyticsService using TDD approach."""
 
 import pytest
-from decimal import Decimal
+
 from unittest.mock import Mock
 from uuid import uuid4
 from datetime import datetime, date
@@ -53,12 +53,12 @@ class TestSalesAnalyticsService:
     ):
         """Test getting basic sales summary."""
         # Mock total sales
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("10000")
+        mock_sales_history_repo.get_total_sales.return_value = 10000
 
         # Mock daily sales
         mock_sales_history_repo.get_daily_sales.return_value = [
-            (date(2025, 11, 6), Decimal("6000")),
-            (date(2025, 11, 7), Decimal("4000")),
+            (date(2025, 11, 6), 6000),
+            (date(2025, 11, 7), 4000),
         ]
 
         # Mock products
@@ -80,9 +80,9 @@ class TestSalesAnalyticsService:
 
         result = sales_analytics_service.get_sales_summary(mock_db)
 
-        assert result.total_revenue == Decimal("10000")
+        assert result.total_revenue == 10000
         assert len(result.daily_revenue) == 2
-        assert result.daily_revenue[0] == Decimal("6000")
+        assert result.daily_revenue[0] == 6000
 
     # Test 2: Calculate completion rate
     def test_get_sales_summary_completion_rate(
@@ -94,7 +94,7 @@ class TestSalesAnalyticsService:
                   15 initial -> 0 remaining = 100% sold
         Overall: (15 + 15) / (20 + 15) = 30/35 = 85.7%
         """
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("10000")
+        mock_sales_history_repo.get_total_sales.return_value = 10000
         mock_sales_history_repo.get_daily_sales.return_value = []
 
         products = [
@@ -123,7 +123,7 @@ class TestSalesAnalyticsService:
         self, sales_analytics_service, mock_sales_history_repo, mock_product_repo, mock_db
     ):
         """Test completion rate when total initial stock is zero."""
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("0")
+        mock_sales_history_repo.get_total_sales.return_value = 0
         mock_sales_history_repo.get_daily_sales.return_value = []
 
         products = [
@@ -145,31 +145,31 @@ class TestSalesAnalyticsService:
         self, sales_analytics_service, mock_sales_history_repo, mock_product_repo, mock_db
     ):
         """Test that daily revenue is ordered correctly."""
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("10000")
+        mock_sales_history_repo.get_total_sales.return_value = 10000
         mock_sales_history_repo.get_daily_sales.return_value = [
-            (date(2025, 11, 7), Decimal("4000")),  # Day 2
-            (date(2025, 11, 6), Decimal("6000")),  # Day 1
+            (date(2025, 11, 7), 4000),  # Day 2
+            (date(2025, 11, 6), 6000),  # Day 1
         ]
         mock_product_repo.get_all.return_value = []
 
         result = sales_analytics_service.get_sales_summary(mock_db)
 
         # Should be ordered by date desc (most recent first)
-        assert result.daily_revenue[0] == Decimal("4000")
-        assert result.daily_revenue[1] == Decimal("6000")
+        assert result.daily_revenue[0] == 4000
+        assert result.daily_revenue[1] == 6000
 
     # Test 5: Empty sales history
     def test_get_sales_summary_no_sales(
         self, sales_analytics_service, mock_sales_history_repo, mock_product_repo, mock_db
     ):
         """Test sales summary with no sales."""
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("0")
+        mock_sales_history_repo.get_total_sales.return_value = 0
         mock_sales_history_repo.get_daily_sales.return_value = []
         mock_product_repo.get_all.return_value = []
 
         result = sales_analytics_service.get_sales_summary(mock_db)
 
-        assert result.total_revenue == Decimal("0")
+        assert result.total_revenue == 0
         assert len(result.daily_revenue) == 0
         assert result.completion_rate == 0.0
 
@@ -178,7 +178,7 @@ class TestSalesAnalyticsService:
         self, sales_analytics_service, mock_sales_history_repo, mock_product_repo, mock_db
     ):
         """Test completion rate when all products are sold out."""
-        mock_sales_history_repo.get_total_sales.return_value = Decimal("10000")
+        mock_sales_history_repo.get_total_sales.return_value = 10000
         mock_sales_history_repo.get_daily_sales.return_value = []
 
         products = [

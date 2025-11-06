@@ -1,7 +1,6 @@
 """Tests for SalesService using TDD approach."""
 
 import pytest
-from decimal import Decimal
 from unittest.mock import Mock, MagicMock, call
 from uuid import uuid4
 from datetime import datetime
@@ -84,8 +83,8 @@ class TestSalesService:
         product = Product(
             id=product_id,
             name="からあげ弁当",
-            unit_cost=Decimal("300"),
-            sale_price=Decimal("500"),
+            unit_cost=300,
+            sale_price=500,
             current_stock=10,
             product_type="single",
         )
@@ -100,7 +99,7 @@ class TestSalesService:
         )
         mock_sales_history_repo.create_sale.return_value = Mock(
             id=uuid4(),
-            total_amount=Decimal("1000"),
+            total_amount=1000,
             timestamp=datetime.now(),
         )
 
@@ -108,7 +107,7 @@ class TestSalesService:
         result = sales_service.process_checkout(checkout_items, mock_db)
 
         # Verify
-        assert result.total_amount == Decimal("1000")
+        assert result.total_amount == 1000
         mock_product_repo.decrement_stock.assert_called_once_with(product_id, 2, mock_db)
         mock_sales_history_repo.create_sale.assert_called_once()
 
@@ -125,8 +124,8 @@ class TestSalesService:
         product = Product(
             id=product_id,
             name="test product",
-            unit_cost=Decimal("100"),
-            sale_price=Decimal("200"),
+            unit_cost=100,
+            sale_price=200,
             current_stock=3,  # Only 3 available
             product_type="single",
         )
@@ -168,16 +167,16 @@ class TestSalesService:
         set_product = Product(
             id=set_product_id,
             name="からあげ弁当セット",
-            unit_cost=Decimal("500"),
-            sale_price=Decimal("800"),
+            unit_cost=500,
+            sale_price=800,
             product_type="set",
         )
 
         item1 = Product(
             id=item1_id,
             name="からあげ",
-            unit_cost=Decimal("100"),
-            sale_price=Decimal("150"),
+            unit_cost=100,
+            sale_price=150,
             current_stock=20,
             product_type="single",
         )
@@ -185,8 +184,8 @@ class TestSalesService:
         item2 = Product(
             id=item2_id,
             name="ご飯",
-            unit_cost=Decimal("50"),
-            sale_price=Decimal("100"),
+            unit_cost=50,
+            sale_price=100,
             current_stock=30,
             product_type="single",
         )
@@ -207,7 +206,7 @@ class TestSalesService:
         )
         mock_sales_history_repo.create_sale.return_value = Mock(
             id=uuid4(),
-            total_amount=Decimal("800"),
+            total_amount=800,
             timestamp=datetime.now(),
         )
 
@@ -235,8 +234,8 @@ class TestSalesService:
         product1 = Product(
             id=product1_id,
             name="からあげ弁当",
-            unit_cost=Decimal("300"),
-            sale_price=Decimal("500"),
+            unit_cost=300,
+            sale_price=500,
             current_stock=10,
             product_type="single",
         )
@@ -244,8 +243,8 @@ class TestSalesService:
         product2 = Product(
             id=product2_id,
             name="焼きそば",
-            unit_cost=Decimal("200"),
-            sale_price=Decimal("400"),
+            unit_cost=200,
+            sale_price=400,
             current_stock=5,
             product_type="single",
         )
@@ -262,13 +261,13 @@ class TestSalesService:
         )
         mock_sales_history_repo.create_sale.return_value = Mock(
             id=uuid4(),
-            total_amount=Decimal("1400"),  # 500*2 + 400*1
+            total_amount=1400,  # 500*2 + 400*1
             timestamp=datetime.now(),
         )
 
         result = sales_service.process_checkout(checkout_items, mock_db)
 
-        assert result.total_amount == Decimal("1400")
+        assert result.total_amount == 1400
         assert mock_product_repo.decrement_stock.call_count == 2
 
     # Test 5: Product not found error
@@ -300,8 +299,8 @@ class TestSalesService:
         product = Product(
             id=product_id,
             name="test",
-            unit_cost=Decimal("100"),
-            sale_price=Decimal("200"),
+            unit_cost=100,
+            sale_price=200,
             current_stock=10,
             product_type="single",
         )
@@ -337,8 +336,8 @@ class TestSalesService:
         product = Product(
             id=product_id,
             name="からあげ弁当",
-            unit_cost=Decimal("300"),
-            sale_price=Decimal("500"),
+            unit_cost=300,
+            sale_price=500,
             current_stock=10,
             product_type="single",
         )
@@ -352,7 +351,7 @@ class TestSalesService:
         )
         mock_sales_history_repo.create_sale.return_value = Mock(
             id=uuid4(),
-            total_amount=Decimal("1000"),
+            total_amount=1000,
             timestamp=datetime.now(),
         )
 
@@ -365,7 +364,7 @@ class TestSalesService:
 
         assert len(items_arg) == 1
         assert items_arg[0]["product_name"] == "からあげ弁当"
-        assert items_arg[0]["unit_cost"] == Decimal("300")
-        assert items_arg[0]["sale_price"] == Decimal("500")
+        assert items_arg[0]["unit_cost"] == 300
+        assert items_arg[0]["sale_price"] == 500
         assert items_arg[0]["quantity"] == 2
-        assert items_arg[0]["subtotal"] == Decimal("1000")
+        assert items_arg[0]["subtotal"] == 1000

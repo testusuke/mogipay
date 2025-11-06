@@ -1,7 +1,7 @@
 """Tests for SalesHistoryService using TDD approach."""
 
 import pytest
-from decimal import Decimal
+
 from unittest.mock import Mock
 from uuid import uuid4
 from datetime import datetime, timedelta
@@ -45,12 +45,12 @@ class TestSalesHistoryService:
         sales = [
             SalesHistory(
                 id=uuid4(),
-                total_amount=Decimal("1000"),
+                total_amount=1000,
                 timestamp=datetime(2025, 11, 6, 10, 0),
             ),
             SalesHistory(
                 id=uuid4(),
-                total_amount=Decimal("500"),
+                total_amount=500,
                 timestamp=datetime(2025, 11, 6, 11, 0),
             ),
         ]
@@ -64,7 +64,7 @@ class TestSalesHistoryService:
         )
 
         assert len(result) == 2
-        assert result[0].total_amount == Decimal("1000")
+        assert result[0].total_amount == 1000
 
     # Test 2: Get sales history with date filter
     def test_get_sales_history_with_date_filter(
@@ -77,7 +77,7 @@ class TestSalesHistoryService:
         sales = [
             SalesHistory(
                 id=uuid4(),
-                total_amount=Decimal("1000"),
+                total_amount=1000,
                 timestamp=datetime(2025, 11, 6, 10, 0),
             ),
         ]
@@ -103,12 +103,12 @@ class TestSalesHistoryService:
         sales = [
             SalesHistory(
                 id=uuid4(),
-                total_amount=Decimal("500"),
+                total_amount=500,
                 timestamp=datetime(2025, 11, 6, 11, 0),
             ),
             SalesHistory(
                 id=uuid4(),
-                total_amount=Decimal("1000"),
+                total_amount=1000,
                 timestamp=datetime(2025, 11, 6, 10, 0),
             ),
         ]
@@ -132,7 +132,7 @@ class TestSalesHistoryService:
         sale_id = uuid4()
         sale = SalesHistory(
             id=sale_id,
-            total_amount=Decimal("1000"),
+            total_amount=1000,
             timestamp=datetime.now(),
         )
 
@@ -141,7 +141,7 @@ class TestSalesHistoryService:
         result = sales_history_service.get_sales_by_id(sale_id, mock_db)
 
         assert result.id == sale_id
-        assert result.total_amount == Decimal("1000")
+        assert result.total_amount == 1000
 
     # Test 5: Get sales by ID - not found
     def test_get_sales_by_id_not_found(

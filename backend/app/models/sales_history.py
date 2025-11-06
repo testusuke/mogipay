@@ -2,9 +2,8 @@
 
 import uuid
 from datetime import datetime
-from decimal import Decimal
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy import Column, Numeric, DateTime, CheckConstraint
+from sqlalchemy import Column, Integer, DateTime, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -23,7 +22,7 @@ class SalesHistory(Base):
     __tablename__ = "sales_history"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    total_amount = Column(Numeric(10, 2), nullable=False)
+    total_amount = Column(Integer, nullable=False)
     timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     # Relationships
@@ -45,9 +44,9 @@ class SaleItem(BaseModel):
     product_id: str
     product_name: str
     quantity: int
-    unit_cost: Decimal
-    sale_price: Decimal
-    subtotal: Decimal
+    unit_cost: int
+    sale_price: int
+    subtotal: int
 
 
 class SaleTransaction(BaseModel):
@@ -56,6 +55,6 @@ class SaleTransaction(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    total_amount: Decimal
+    total_amount: int
     timestamp: datetime
     items: list[SaleItem]

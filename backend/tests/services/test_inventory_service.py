@@ -1,7 +1,7 @@
 """Tests for InventoryService using TDD approach."""
 
 import pytest
-from decimal import Decimal
+
 from unittest.mock import Mock, MagicMock
 from uuid import uuid4
 
@@ -240,8 +240,8 @@ class TestInventoryService:
                 product_type="single",
                 current_stock=10,
                 initial_stock=20,
-                unit_cost=Decimal("300"),
-                sale_price=Decimal("500"),
+                unit_cost=300,
+                sale_price=500,
             ),
             Product(
                 id=uuid4(),
@@ -249,8 +249,8 @@ class TestInventoryService:
                 product_type="single",
                 current_stock=0,
                 initial_stock=15,
-                unit_cost=Decimal("200"),
-                sale_price=Decimal("400"),
+                unit_cost=200,
+                sale_price=400,
             ),
         ]
 
@@ -282,8 +282,8 @@ class TestInventoryService:
             product_type="set",
             current_stock=0,  # Set products don't track stock directly
             initial_stock=0,
-            unit_cost=Decimal("500"),
-            sale_price=Decimal("800"),
+            unit_cost=500,
+            sale_price=800,
         )
 
         single_product = Product(
@@ -292,8 +292,8 @@ class TestInventoryService:
             product_type="single",
             current_stock=20,
             initial_stock=30,
-            unit_cost=Decimal("100"),
-            sale_price=Decimal("150"),
+            unit_cost=100,
+            sale_price=150,
         )
 
         mock_product_repo.get_all.return_value = [set_product, single_product]
