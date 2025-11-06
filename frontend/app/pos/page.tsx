@@ -26,6 +26,8 @@ export default function POSScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
+  // Virtual stock management - tracks available stock after cart operations
+  const [availableStock, setAvailableStock] = useState<Map<string, number>>(new Map());
 
   // Load products on mount
   useEffect(() => {
@@ -56,6 +58,16 @@ export default function POSScreen() {
       setLoading(true);
       const data = await apiClient.getProducts();
       setProducts(data);
+
+      // Initialize available stock with ONLY single product stock values
+      // Set products' stock will be calculated dynamically from component items
+      const stockMap = new Map<string, number>();
+      data.forEach((product) => {
+        if (product.product_type === 'single') {
+          stockMap.set(product.id, product.current_stock);
+        }
+      });
+      setAvailableStock(stockMap);
     } catch (err) {
       console.error("Failed to load products:", err);
       setError("商品の読み込みに失敗しました");
@@ -64,7 +76,115 @@ export default function POSScreen() {
     }
   };
 
+  // Calculate set product stock dynamically from component items
+  // Returns the maximum number of sets that can be made
+  const calculateSetStock = (product: Product): number => {
+    if (product.product_type === 'single') {
+      return availableStock.get(product.id) || 0;
+    }
+
+    if (!product.set_items || product.set_items.length === 0) {
+      return 0;
+    }
+
+    // Calculate how many sets can be made from each component
+    // The minimum value determines the total set stock
+    let minSetCount = Infinity;
+
+    for (const item of product.set_items) {
+      const componentStock = availableStock.get(item.product_id) || 0;
+      const possibleSets = Math.floor(componentStock / item.quantity);
+      minSetCount = Math.min(minSetCount, possibleSets);
+    }
+
+    return minSetCount === Infinity ? 0 : minSetCount;
+  };
+
+  // Check if product can be added to cart (stock validation)
+  const canAddToCart = (product: Product): { canAdd: boolean; reason?: string } => {
+    const stock = calculateSetStock(product);
+
+    if (stock <= 0) {
+      if (product.product_type === 'single') {
+        return { canAdd: false, reason: `${product.name}の在庫が不足しています` };
+      } else {
+        // For set products, find which component is insufficient
+        if (!product.set_items || product.set_items.length === 0) {
+          return { canAdd: false, reason: 'セット構成が不正です' };
+        }
+
+        for (const item of product.set_items) {
+          const componentStock = availableStock.get(item.product_id) || 0;
+          if (componentStock < item.quantity) {
+            const componentProduct = products.find((p) => p.id === item.product_id);
+            const componentName = componentProduct?.name || '構成商品';
+            return {
+              canAdd: false,
+              reason: `${product.name}の構成単品「${componentName}」の在庫が不足しています（必要: ${item.quantity}個、在庫: ${componentStock}個）`,
+            };
+          }
+        }
+      }
+    }
+
+    return { canAdd: true };
+  };
+
+  // Update available stock after adding to cart
+  const updateStockAfterAdd = (product: Product) => {
+    setAvailableStock((prev) => {
+      const newStock = new Map(prev);
+
+      if (product.product_type === 'single') {
+        // Decrement single product stock
+        const currentStock = newStock.get(product.id) || 0;
+        newStock.set(product.id, currentStock - 1);
+      } else if (product.set_items) {
+        // Decrement all component items' stock
+        product.set_items.forEach((item) => {
+          const currentStock = newStock.get(item.product_id) || 0;
+          newStock.set(item.product_id, currentStock - item.quantity);
+        });
+      }
+
+      return newStock;
+    });
+  };
+
+  // Restore available stock after removing from cart
+  const updateStockAfterRemove = (product: Product, quantity: number) => {
+    setAvailableStock((prev) => {
+      const newStock = new Map(prev);
+
+      if (product.product_type === 'single') {
+        // Increment single product stock
+        const currentStock = newStock.get(product.id) || 0;
+        newStock.set(product.id, currentStock + quantity);
+      } else if (product.set_items) {
+        // Increment all component items' stock
+        product.set_items.forEach((item) => {
+          const currentStock = newStock.get(item.product_id) || 0;
+          newStock.set(item.product_id, currentStock + (item.quantity * quantity));
+        });
+      }
+
+      return newStock;
+    });
+  };
+
   const addToCart = (product: Product) => {
+    // Check stock availability
+    const stockCheck = canAddToCart(product);
+    if (!stockCheck.canAdd) {
+      setError(stockCheck.reason || '在庫が不足しています');
+      setShowErrorDialog(true);
+      return;
+    }
+
+    // Update virtual stock
+    updateStockAfterAdd(product);
+
+    // Add to cart
     setCart((prev) => {
       const existingItem = prev.find((item) => item.productId === product.id);
 
@@ -96,6 +216,21 @@ export default function POSScreen() {
   };
 
   const incrementQuantity = (productId: string) => {
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+
+    // Check stock availability before incrementing
+    const stockCheck = canAddToCart(product);
+    if (!stockCheck.canAdd) {
+      setError(stockCheck.reason || '在庫が不足しています');
+      setShowErrorDialog(true);
+      return;
+    }
+
+    // Update virtual stock
+    updateStockAfterAdd(product);
+
+    // Increment quantity in cart
     setCart((prev) =>
       prev.map((item) =>
         item.productId === productId
@@ -110,15 +245,22 @@ export default function POSScreen() {
   };
 
   const decrementQuantity = (productId: string) => {
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+
     setCart((prev) => {
       const item = prev.find((i) => i.productId === productId);
 
       if (!item) return prev;
 
       if (item.quantity === 1) {
+        // Restore stock when removing from cart
+        updateStockAfterRemove(product, 1);
         // Remove item if quantity is 1
         return prev.filter((i) => i.productId !== productId);
       } else {
+        // Restore stock when decrementing
+        updateStockAfterRemove(product, 1);
         // Decrement quantity
         return prev.map((i) =>
           i.productId === productId
@@ -151,6 +293,10 @@ export default function POSScreen() {
 
       // Clear cart on success
       setCart([]);
+
+      // Reload products to get updated stock values
+      await loadProducts();
+
       setError("精算が完了しました");
       setShowErrorDialog(true);
     } catch (err) {
@@ -191,36 +337,42 @@ export default function POSScreen() {
                 <p className="text-center text-gray-500">読み込み中...</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {sortedProducts.map((product) => (
-                    <Card
-                      key={product.id}
-                      className={`cursor-pointer hover:shadow-lg transition-shadow ${
-                        product.current_stock === 0
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        product.current_stock > 0 && addToCart(product)
-                      }
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-semibold text-lg">
-                            {product.name}
-                          </h3>
-                          {product.current_stock === 0 && (
-                            <Badge variant="destructive">在庫切れ</Badge>
-                          )}
-                        </div>
-                        <p className="text-2xl font-bold text-blue-600">
-                          ¥{product.sale_price.toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          在庫: {product.current_stock}個
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ))}
+                  {sortedProducts.map((product) => {
+                    // Calculate stock dynamically (single or set)
+                    const stock = calculateSetStock(product);
+                    const isOutOfStock = stock === 0;
+
+                    return (
+                      <Card
+                        key={product.id}
+                        className={`cursor-pointer hover:shadow-lg transition-shadow ${
+                          isOutOfStock
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          !isOutOfStock && addToCart(product)
+                        }
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-semibold text-lg">
+                              {product.name}
+                            </h3>
+                            {isOutOfStock && (
+                              <Badge variant="destructive">在庫切れ</Badge>
+                            )}
+                          </div>
+                          <p className="text-2xl font-bold text-blue-600">
+                            ¥{product.sale_price.toLocaleString()}
+                          </p>
+                          <p className="text-sm text-gray-500 mt-1">
+                            在庫: {stock}個
+                          </p>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
