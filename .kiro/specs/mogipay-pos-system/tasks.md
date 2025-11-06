@@ -62,27 +62,35 @@
   - _Requirements: 1.1-1.6, 7.1-7.7, 9.1-9.6_
 
 - [ ] 2. バックエンド - Repository層の実装(TDD)
-- [ ] 2.1 ProductRepositoryの実装(TDD)
+- [x] 2.1 ProductRepositoryの実装(TDD)
   - 商品の作成、取得、更新、削除機能を実装
   - 在庫減算機能を実装(同時実行制御を含む)
   - 在庫が負にならない制約のテストを先に記述
   - 同時販売での在庫不整合防止のテスト
   - セット商品削除時のカスケード削除テスト
+  - InsufficientStockError例外の実装
+  - SELECT FOR UPDATEによる行ロック実装
+  - testcontainersを使用した統合テスト（9テスト全てパス）
   - _Requirements: 1.1-1.6, 7.3-7.4_
 
-- [ ] 2.2 SetItemRepositoryの実装(TDD)
+- [x] 2.2 SetItemRepositoryの実装(TDD)
   - セット商品と構成単品の関連を管理する機能
   - セット構成の一括作成機能
   - セット商品IDでの構成取得機能
   - セット削除時の構成自動削除のテスト
+  - ユニーク制約の検証テスト
+  - 一括削除機能の実装
+  - testcontainersを使用した統合テスト（6テスト全てパス）
   - _Requirements: 1.4-1.5, 7.4-7.5_
 
-- [ ] 2.3 SalesHistoryRepositoryの実装(TDD)
+- [x] 2.3 SalesHistoryRepositoryの実装(TDD)
   - 販売トランザクションの記録機能
   - 販売明細の保存(価格スナップショット)
   - 日付範囲での販売履歴取得機能
   - 総売上と日別売上の集計機能
   - 価格変更後も過去データが不変であることのテスト
+  - カスケード削除の検証テスト
+  - testcontainersを使用した統合テスト（7テスト全てパス）
   - _Requirements: 2.1-2.4, 4.1-4.4, 9.1_
 
 - [ ] 3. バックエンド - Service層の実装(TDD)
