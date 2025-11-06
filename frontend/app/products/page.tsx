@@ -265,49 +265,102 @@ export default function ProductManagement() {
           {loading && products.length === 0 ? (
             <div className="text-center py-8">読み込み中...</div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>商品名</TableHead>
-                  <TableHead>種別</TableHead>
-                  <TableHead className="text-right">単価</TableHead>
-                  <TableHead className="text-right">販売価格</TableHead>
-                  <TableHead className="text-right">在庫数</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Desktop: Table view */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>商品名</TableHead>
+                      <TableHead>種別</TableHead>
+                      <TableHead className="text-right">単価</TableHead>
+                      <TableHead className="text-right">販売価格</TableHead>
+                      <TableHead className="text-right">在庫数</TableHead>
+                      <TableHead className="text-right">操作</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {products.map((product) => (
+                      <TableRow key={product.id}>
+                        <TableCell className="font-medium">{product.name}</TableCell>
+                        <TableCell>
+                          <Badge variant={product.product_type === "set" ? "default" : "secondary"}>
+                            {product.product_type === "set" ? "セット" : "単品"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">¥{product.unit_cost.toLocaleString()}</TableCell>
+                        <TableCell className="text-right">¥{product.sale_price.toLocaleString()}</TableCell>
+                        <TableCell className="text-right">{product.current_stock}</TableCell>
+                        <TableCell className="text-right space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openEditDialog(product)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => openDeleteDialog(product)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile: Card view */}
+              <div className="md:hidden space-y-4">
                 {products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>
-                      <Badge variant={product.product_type === "set" ? "default" : "secondary"}>
-                        {product.product_type === "set" ? "セット" : "単品"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">¥{product.unit_cost.toLocaleString()}</TableCell>
-                    <TableCell className="text-right">¥{product.sale_price.toLocaleString()}</TableCell>
-                    <TableCell className="text-right">{product.current_stock}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEditDialog(product)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => openDeleteDialog(product)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                  <Card key={product.id}>
+                    <CardHeader className="pb-3">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <CardTitle className="text-lg">{product.name}</CardTitle>
+                          <Badge variant={product.product_type === "set" ? "default" : "secondary"}>
+                            {product.product_type === "set" ? "セット" : "単品"}
+                          </Badge>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openEditDialog(product)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => openDeleteDialog(product)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">単価</span>
+                        <span className="font-medium">¥{product.unit_cost.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">販売価格</span>
+                        <span className="font-medium">¥{product.sale_price.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">在庫数</span>
+                        <span className="font-medium">{product.current_stock}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
