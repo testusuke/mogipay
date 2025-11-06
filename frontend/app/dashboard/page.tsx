@@ -207,9 +207,9 @@ export default function DashboardPage() {
                       <div className="mt-2 space-y-1">
                         <div className="flex items-center justify-between text-sm text-muted-foreground">
                           <span>在庫率</span>
-                          <span>{product.stock_rate.toFixed(1)}%</span>
+                          <span>{(product.stock_rate * 100).toFixed(1)}%</span>
                         </div>
-                        <Progress value={product.stock_rate} />
+                        <Progress value={product.stock_rate * 100} />
                         <p className="text-sm text-muted-foreground">
                           残り: {product.current_stock} /{' '}
                           {product.initial_stock}
