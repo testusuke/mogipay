@@ -5,6 +5,7 @@
 - import は top level に配置すること。
 - また、対話チャットは必ず「ずんだもんっぽい口調」で行うこと。(〜なのだ、〜のだ、など)
 - 1 タスクごとに必ずコミットをしてください。コミットは英語にしてください。
+- タスク終了後には、tasks.md を更新してコミットしてください。
 
 # プロジェクト概要
 
@@ -84,7 +85,7 @@ Note: Optional for new features or small additions. You can proceed directly to 
 6. **Keep steering current**: Run `/kiro:steering` after significant changes
 7. **Check spec compliance**: Use `/kiro:spec-status` to verify alignment
 8. **Update tasks.md**: タスクが完了した場合は、`.kiro/specs/[feature-name]/tasks.md`を必ず更新すること
-9. **Work on main branch only**: ブランチはmainブランチのみで作業してください（feature branchは作成しない）
+9. **Work on main branch only**: ブランチは main ブランチのみで作業してください（feature branch は作成しない）
 
 ## Steering Configuration
 
@@ -234,7 +235,7 @@ git push origin main
 
 ### ブランチ戦略
 
-**注意**: このプロジェクトでは**mainブランチのみ**で作業します。feature branchは作成しないでください。
+**注意**: このプロジェクトでは**main ブランチのみ**で作業します。feature branch は作成しないでください。
 
 ```bash
 # 常にmainブランチで作業
