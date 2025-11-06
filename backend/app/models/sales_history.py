@@ -2,6 +2,8 @@
 
 import uuid
 from datetime import datetime
+from decimal import Decimal
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import Column, Numeric, DateTime, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -31,3 +33,29 @@ class SalesHistory(Base):
     __table_args__ = (
         CheckConstraint("total_amount >= 0", name="positive_total_amount"),
     )
+
+
+class SaleItem(BaseModel):
+    """Pydantic model for sale item data transfer."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    sale_id: str
+    product_id: str
+    product_name: str
+    quantity: int
+    unit_cost: Decimal
+    sale_price: Decimal
+    subtotal: Decimal
+
+
+class SaleTransaction(BaseModel):
+    """Pydantic model for sale transaction data transfer."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    total_amount: Decimal
+    timestamp: datetime
+    items: list[SaleItem]
