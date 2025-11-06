@@ -12,7 +12,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import product_controller, sales_controller, inventory_controller
+from app.api import product_controller, sales_controller, inventory_controller, financial_controller
 
 # Create FastAPI app
 app = FastAPI(
@@ -38,6 +38,7 @@ app.add_middleware(
 app.include_router(product_controller.router)
 app.include_router(sales_controller.router)
 app.include_router(inventory_controller.router)
+app.include_router(financial_controller.router)
 
 
 @app.get("/health", status_code=status.HTTP_200_OK)
