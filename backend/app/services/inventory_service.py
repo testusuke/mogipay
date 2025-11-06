@@ -142,6 +142,7 @@ class InventoryService:
         # Step 1: Calculate total required quantity for each product
         # by expanding set products into component items
         required_quantities = {}  # {product_id: total_quantity}
+        product_cache = {}  # {product_id: Product} - cache to avoid duplicate DB queries
 
         for item in checkout_items:
             product_id = item["product_id"]
@@ -155,6 +156,9 @@ class InventoryService:
                     is_available=False,
                     insufficient_items=[product_id],
                 )
+
+            # Cache product for Step 2
+            product_cache[product_id] = product
 
             if product.product_type == "single":
                 # Single product: add to required quantities
@@ -170,11 +174,17 @@ class InventoryService:
                     current_required = required_quantities.get(component_id, 0)
                     required_quantities[component_id] = current_required + component_quantity
 
+                    # Cache component products if not already cached
+                    if component_id not in product_cache:
+                        component_product = self.product_repo.get_by_id(component_id, db)
+                        if component_product:
+                            product_cache[component_id] = component_product
+
         # Step 2: Check if sufficient stock is available for all products
         insufficient_items = []
 
         for product_id, required_qty in required_quantities.items():
-            product = self.product_repo.get_by_id(product_id, db)
+            product = product_cache.get(product_id)
             if not product:
                 insufficient_items.append(product_id)
                 continue

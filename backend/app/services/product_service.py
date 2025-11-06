@@ -75,6 +75,9 @@ class ProductService:
     ) -> Product:
         """Create a new product.
 
+        This method manages the transaction for creating both the product
+        and its set items (if applicable) as a single atomic operation.
+
         Args:
             data: Product creation data
             db: Database session
@@ -93,46 +96,57 @@ class ProductService:
         Postconditions:
         - Product is created
         - If set product, set_items are created
+        - Both operations succeed or both are rolled back
         """
-        # Validate set product requirements
-        if data.product_type == "set":
-            if not data.set_items or len(data.set_items) == 0:
-                raise ValueError(
-                    "Set products must have at least one set_items component"
-                )
+        try:
+            # Validate set product requirements
+            if data.product_type == "set":
+                if not data.set_items or len(data.set_items) == 0:
+                    raise ValueError(
+                        "Set products must have at least one set_items component"
+                    )
 
-        # Create product
-        product = self.product_repo.create(
-            name=data.name,
-            unit_cost=data.unit_cost,
-            sale_price=data.sale_price,
-            initial_stock=data.initial_stock,
-            current_stock=data.initial_stock,
-            product_type=data.product_type,
-            db=db,
-        )
-
-        # Create set items if this is a set product
-        if data.product_type == "set" and data.set_items:
-            items_data = [
-                {
-                    "item_product_id": item.product_id,
-                    "quantity": item.quantity,
-                }
-                for item in data.set_items
-            ]
-            self.set_item_repo.create_bulk(
-                set_product_id=product.id,
-                items_data=items_data,
+            # Create product
+            product = self.product_repo.create(
+                name=data.name,
+                unit_cost=data.unit_cost,
+                sale_price=data.sale_price,
+                initial_stock=data.initial_stock,
+                current_stock=data.initial_stock,
+                product_type=data.product_type,
                 db=db,
             )
 
-        return product
+            # Create set items if this is a set product
+            if data.product_type == "set" and data.set_items:
+                items_data = [
+                    {
+                        "item_product_id": item.product_id,
+                        "quantity": item.quantity,
+                    }
+                    for item in data.set_items
+                ]
+                self.set_item_repo.create_bulk(
+                    set_product_id=product.id,
+                    items_data=items_data,
+                    db=db,
+                )
+
+            # Commit transaction
+            db.commit()
+            db.refresh(product)
+            return product
+
+        except Exception:
+            db.rollback()
+            raise
 
     def update_price(
         self, product_id: UUID, new_price: Decimal, db: Session
     ) -> Product:
         """Update product sale price.
+
+        This method manages the transaction for price updates.
 
         Args:
             product_id: Product UUID
@@ -154,15 +168,25 @@ class ProductService:
         - updated_at is updated
         - Past sales history is unchanged (by design)
         """
-        product = self.product_repo.get_by_id(product_id, db)
-        if not product:
-            raise ValueError(f"Product {product_id} not found")
+        try:
+            product = self.product_repo.get_by_id(product_id, db)
+            if not product:
+                raise ValueError(f"Product {product_id} not found")
 
-        return self.product_repo.update(
-            product_id,
-            {"sale_price": new_price},
-            db,
-        )
+            updated_product = self.product_repo.update(
+                product_id,
+                {"sale_price": new_price},
+                db,
+            )
+
+            # Commit transaction
+            db.commit()
+            db.refresh(updated_product)
+            return updated_product
+
+        except Exception:
+            db.rollback()
+            raise
 
     def get_product_by_id(
         self, product_id: UUID, db: Session
@@ -197,6 +221,8 @@ class ProductService:
     ) -> Optional[Product]:
         """Update product attributes.
 
+        This method manages the transaction for product updates.
+
         Args:
             product_id: Product UUID
             updates: Dictionary of fields to update
@@ -205,14 +231,26 @@ class ProductService:
         Returns:
             Updated Product instance if found, None otherwise
         """
-        product = self.product_repo.get_by_id(product_id, db)
-        if not product:
-            return None
+        try:
+            product = self.product_repo.get_by_id(product_id, db)
+            if not product:
+                return None
 
-        return self.product_repo.update(product_id, updates, db)
+            updated_product = self.product_repo.update(product_id, updates, db)
+
+            # Commit transaction
+            db.commit()
+            db.refresh(updated_product)
+            return updated_product
+
+        except Exception:
+            db.rollback()
+            raise
 
     def delete_product(self, product_id: UUID, db: Session) -> bool:
         """Delete a product.
+
+        This method manages the transaction for product deletion.
 
         Args:
             product_id: Product UUID
@@ -221,4 +259,15 @@ class ProductService:
         Returns:
             True if product was deleted, False if not found
         """
-        return self.product_repo.delete(product_id, db)
+        try:
+            result = self.product_repo.delete(product_id, db)
+
+            if result:
+                # Commit transaction
+                db.commit()
+
+            return result
+
+        except Exception:
+            db.rollback()
+            raise

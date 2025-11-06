@@ -24,6 +24,9 @@ class SetItemRepository:
     ) -> SetItem:
         """Create a new set item.
 
+        NOTE: This method does NOT commit the transaction.
+        The caller (Service layer) is responsible for transaction management.
+
         Args:
             set_product_id: Set product UUID
             item_product_id: Item product UUID
@@ -42,8 +45,7 @@ class SetItemRepository:
             quantity=quantity,
         )
         db.add(set_item)
-        db.commit()
-        db.refresh(set_item)
+        db.flush()  # Get the ID without committing
         return set_item
 
     def get_by_set_product_id(
@@ -102,6 +104,9 @@ class SetItemRepository:
     def delete_by_set_product_id(self, set_product_id: UUID, db: Session) -> int:
         """Delete all set items for a set product.
 
+        NOTE: This method does NOT commit the transaction.
+        The caller (Service layer) is responsible for transaction management.
+
         Args:
             set_product_id: Set product UUID
             db: Database session
@@ -111,5 +116,5 @@ class SetItemRepository:
         """
         stmt = delete(SetItem).where(SetItem.set_product_id == set_product_id)
         result = db.execute(stmt)
-        db.commit()
+        db.flush()  # Ensure deletion is ready
         return result.rowcount

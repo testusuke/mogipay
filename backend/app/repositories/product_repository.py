@@ -35,6 +35,9 @@ class ProductRepository:
     ) -> Product:
         """Create a new product.
 
+        NOTE: This method does NOT commit the transaction.
+        The caller (Service layer) is responsible for transaction management.
+
         Args:
             name: Product name
             unit_cost: Unit cost (purchase price)
@@ -59,8 +62,7 @@ class ProductRepository:
             product_type=product_type,
         )
         db.add(product)
-        db.commit()
-        db.refresh(product)
+        db.flush()  # Get the ID without committing
         return product
 
     def get_by_id(self, product_id: UUID, db: Session) -> Optional[Product]:
@@ -100,6 +102,9 @@ class ProductRepository:
     ) -> Optional[Product]:
         """Update a product.
 
+        NOTE: This method does NOT commit the transaction.
+        The caller (Service layer) is responsible for transaction management.
+
         Args:
             product_id: Product UUID
             updates: Dictionary of fields to update
@@ -119,12 +124,14 @@ class ProductRepository:
             if hasattr(product, key):
                 setattr(product, key, value)
 
-        db.commit()
-        db.refresh(product)
+        db.flush()  # Ensure changes are ready
         return product
 
     def delete(self, product_id: UUID, db: Session) -> bool:
         """Delete a product.
+
+        NOTE: This method does NOT commit the transaction.
+        The caller (Service layer) is responsible for transaction management.
 
         Args:
             product_id: Product UUID
@@ -138,7 +145,7 @@ class ProductRepository:
             return False
 
         db.delete(product)
-        db.commit()
+        db.flush()  # Ensure deletion is ready
         return True
 
     def decrement_stock(
