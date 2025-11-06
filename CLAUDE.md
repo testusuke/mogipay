@@ -83,6 +83,8 @@ Note: Optional for new features or small additions. You can proceed directly to 
 5. **Update task status**: Mark tasks as completed when working on them
 6. **Keep steering current**: Run `/kiro:steering` after significant changes
 7. **Check spec compliance**: Use `/kiro:spec-status` to verify alignment
+8. **Update tasks.md**: タスクが完了した場合は、`.kiro/specs/[feature-name]/tasks.md`を必ず更新すること
+9. **Work on main branch only**: ブランチはmainブランチのみで作業してください（feature branchは作成しない）
 
 ## Steering Configuration
 
@@ -227,21 +229,21 @@ git commit -m "fix: 在庫計算ロジックの修正"
 git commit -m "test: SalesServiceのテスト追加"
 
 # プッシュ
-git push origin <branch-name>
+git push origin main
 ```
 
 ### ブランチ戦略
 
+**注意**: このプロジェクトでは**mainブランチのみ**で作業します。feature branchは作成しないでください。
+
 ```bash
-# 新機能開発
-git checkout -b feature/pos-screen
-git checkout -b feature/product-management
+# 常にmainブランチで作業
+git checkout main
 
-# バグ修正
-git checkout -b fix/inventory-calculation
-
-# リファクタリング
-git checkout -b refactor/service-layer
+# 直接mainにコミット・プッシュ
+git add .
+git commit -m "feat: 機能実装"
+git push origin main
 ```
 
 ## 開発終了時
