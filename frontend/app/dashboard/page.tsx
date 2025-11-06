@@ -136,9 +136,9 @@ export default function DashboardPage() {
               <CardContent>
                 <div className="space-y-2">
                   <p className="text-4xl font-bold">
-                    {data.sales.completion_rate.toFixed(1)}%
+                    {(data.sales.completion_rate * 100).toFixed(1)}%
                   </p>
-                  <Progress value={data.sales.completion_rate} />
+                  <Progress value={data.sales.completion_rate * 100} />
                 </div>
               </CardContent>
             </Card>
