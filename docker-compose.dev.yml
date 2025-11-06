@@ -1,9 +1,9 @@
 # Development environment Docker Compose configuration
-# This file contains only PostgreSQL 18 for backend development
+# This file contains only PostgreSQL 16 for backend development
 
 services:
   postgres:
-    image: postgres:18
+    image: postgres:16
     container_name: mogipay_postgres_dev
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-mogipay_dev}
