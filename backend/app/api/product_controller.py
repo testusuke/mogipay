@@ -20,6 +20,7 @@ from app.services.product_service import (
     CreateProductData,
     SetItemData,
 )
+from app.services.inventory_service import InventoryService
 from app.schemas.product import (
     CreateProductRequest,
     UpdateProductRequest,
@@ -39,6 +40,15 @@ def get_product_service() -> ProductService:
         ProductService instance
     """
     return ProductService()
+
+
+def get_inventory_service() -> InventoryService:
+    """Dependency to get InventoryService instance.
+
+    Returns:
+        InventoryService instance
+    """
+    return InventoryService()
 
 
 @router.post(
@@ -122,19 +132,35 @@ def get_all_products(
     product_type: Optional[str] = None,
     db: Session = Depends(get_db),
     product_service: ProductService = Depends(get_product_service),
+    inventory_service: InventoryService = Depends(get_inventory_service),
 ) -> List[ProductResponse]:
     """Get all products, optionally filtered by type.
+
+    For set products, calculates current_stock dynamically from component items.
 
     Args:
         product_type: Optional product type filter ('single' or 'set')
         db: Database session
         product_service: Product service instance
+        inventory_service: Inventory service instance
 
     Returns:
-        List of products
+        List of products with calculated stock for set products
     """
     products = product_service.get_all_products(db, product_type=product_type)
-    return [ProductResponse.model_validate(p) for p in products]
+
+    # Calculate stock for set products dynamically
+    result = []
+    for product in products:
+        if product.product_type == "set":
+            # Calculate set stock from component items
+            calculated_stock = inventory_service.calculate_set_stock(product.id, db)
+            # Override current_stock with calculated value
+            product.current_stock = calculated_stock
+
+        result.append(ProductResponse.model_validate(product))
+
+    return result
 
 
 @router.get(
@@ -149,16 +175,20 @@ def get_product_by_id(
     product_id: UUID,
     db: Session = Depends(get_db),
     product_service: ProductService = Depends(get_product_service),
+    inventory_service: InventoryService = Depends(get_inventory_service),
 ) -> ProductResponse:
     """Get product by ID.
+
+    For set products, calculates current_stock dynamically from component items.
 
     Args:
         product_id: Product UUID
         db: Database session
         product_service: Product service instance
+        inventory_service: Inventory service instance
 
     Returns:
-        Product data
+        Product data with calculated stock for set products
 
     Raises:
         HTTPException 404: If product not found
@@ -176,6 +206,11 @@ def get_product_by_id(
                 },
             },
         )
+
+    # Calculate stock for set products dynamically
+    if product.product_type == "set":
+        calculated_stock = inventory_service.calculate_set_stock(product.id, db)
+        product.current_stock = calculated_stock
 
     return ProductResponse.model_validate(product)
 

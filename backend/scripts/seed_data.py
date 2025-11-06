@@ -10,7 +10,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from app.database import SessionLocal
-from app.models import Product, SetItem
+from app.models import Product, SetItem, SalesHistory, SaleItem
 
 
 def clear_existing_data(db):
@@ -18,8 +18,10 @@ def clear_existing_data(db):
     print("🗑️  Clearing existing data...")
     try:
         # Delete in correct order due to foreign key constraints
-        db.query(SetItem).delete()
-        db.query(Product).delete()
+        db.query(SaleItem).delete()  # First delete sale items
+        db.query(SalesHistory).delete()  # Then delete sales history
+        db.query(SetItem).delete()  # Then delete set items
+        db.query(Product).delete()  # Finally delete products
         db.commit()
         print("✅ Existing data cleared")
     except Exception as e:
