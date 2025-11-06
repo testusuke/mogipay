@@ -250,7 +250,7 @@
   - ESLint チェック合格
   - _Requirements: 全要件(API との連携基盤)_
 
-- [ ] 6.3 POSScreen(レジ画面)の実装
+- [x] 6.3 POSScreen(レジ画面)の実装
 
   - 商品選択 UI の実装
   - +/-ボタンでの数量入力機能
@@ -259,6 +259,8 @@
   - 精算ボタンと精算処理の実装
   - 在庫不足エラーの表示
   - レスポンシブデザイン(タブレット/スマホ対応)
+  - frontend/app/pos/page.tsx 実装完了
+  - ESLint チェック合格
   - _Requirements: 3.1-3.8, 8.1-8.5_
 
 - [ ] 6.4 ProductManagement(商品管理)の実装
