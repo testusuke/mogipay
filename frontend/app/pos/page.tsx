@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Minus, ShoppingCart } from "lucide-react";
 import { apiClient } from "@/lib/api";
-import type { Product } from "@/lib/api/types";
+import type { Product, ErrorDetail } from "@/lib/api/types";
 import { ApiClientError, InsufficientStockError } from "@/lib/api/errors";
 
 interface CartItem {
@@ -157,10 +157,11 @@ export default function POSScreen() {
       console.error("Checkout failed:", err);
 
       if (err instanceof InsufficientStockError) {
+        const details = err.details as ErrorDetail | undefined;
         setError(
           `在庫不足: ${err.message}\n` +
-          `要求数量: ${err.details?.requested || "N/A"}\n` +
-          `利用可能数量: ${err.details?.available || "N/A"}`
+          `要求数量: ${details?.requested || "N/A"}\n` +
+          `利用可能数量: ${details?.available || "N/A"}`
         );
       } else if (err instanceof ApiClientError) {
         setError(`エラー: ${err.message}`);
