@@ -486,7 +486,7 @@ dev = [
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest-asyncio", specifier = ">=1.2.0" },
     { name = "pytest-cov", specifier = ">=7.0.0" },
-    { name = "testcontainers", specifier = ">=4.13.2" },
+    { name = "testcontainers", extras = ["postgres"], specifier = ">=4.13.2" },
 ]
 
 [[package]]
