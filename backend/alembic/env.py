@@ -33,6 +33,9 @@ if config.config_file_name is not None:
 # Import Base from database module for 'autogenerate' support
 from app.database import Base
 
+# Import all models to register them with Base.metadata
+from app.models import Product, SetItem, SalesHistory, SaleItem
+
 # Set target_metadata to Base.metadata for autogenerate
 target_metadata = Base.metadata
 
