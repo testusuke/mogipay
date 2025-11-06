@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +37,19 @@ export default function POSScreen() {
     const total = cart.reduce((sum, item) => sum + item.subtotal, 0);
     setTotalAmount(total);
   }, [cart]);
+
+  // Sort products: set products first, then single products, each sorted by name
+  const sortedProducts = useMemo(() => {
+    const setProducts = products
+      .filter((p) => p.product_type === 'set')
+      .sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+
+    const singleProducts = products
+      .filter((p) => p.product_type === 'single')
+      .sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+
+    return [...setProducts, ...singleProducts];
+  }, [products]);
 
   const loadProducts = async () => {
     try {
@@ -173,11 +186,11 @@ export default function POSScreen() {
               <CardTitle>商品一覧</CardTitle>
             </CardHeader>
             <CardContent>
-              {loading && products.length === 0 ? (
+              {loading && sortedProducts.length === 0 ? (
                 <p className="text-center text-gray-500">読み込み中...</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {products.map((product) => (
+                  {sortedProducts.map((product) => (
                     <Card
                       key={product.id}
                       className={`cursor-pointer hover:shadow-lg transition-shadow ${
