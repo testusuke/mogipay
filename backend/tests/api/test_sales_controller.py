@@ -79,12 +79,13 @@ def test_checkout_success(client, mock_sales_service):
         pytest.skip("App not created yet (TDD Red phase)")
 
     # Setup mock
-    sale_id = str(uuid4())
-    mock_sales_service.process_checkout.return_value = SaleTransaction(
-        id=sale_id,
+    from uuid import UUID
+    from app.services.sales_service import CheckoutResult
+    sale_id = uuid4()
+    mock_sales_service.process_checkout.return_value = CheckoutResult(
+        sale_id=sale_id,
         total_amount=Decimal("1000.00"),
-        timestamp=datetime.now(UTC),
-        items=[]
+        timestamp=datetime.now(UTC)
     )
 
     # Execute
@@ -97,7 +98,7 @@ def test_checkout_success(client, mock_sales_service):
     # Assert
     assert response.status_code == 200
     data = response.json()
-    assert data["sale_id"] == sale_id
+    assert data["sale_id"] == str(sale_id)
     assert data["total_amount"] == "1000.00"
     assert "timestamp" in data
 
@@ -193,27 +194,28 @@ def test_get_sales_history_all(client, mock_sales_history_service):
     if client is None:
         pytest.skip("App not created yet (TDD Red phase)")
 
-    # Setup mock
-    sale_id = str(uuid4())
-    mock_sales_history_service.get_sales_history.return_value = [
-        SaleTransaction(
-            id=sale_id,
-            total_amount=Decimal("1500.00"),
-            timestamp=datetime.now(UTC),
-            items=[
-                SaleItem(
-                    id=str(uuid4()),
-                    sale_id=sale_id,
-                    product_id=str(uuid4()),
-                    product_name="Test Product",
-                    quantity=3,
-                    unit_cost=Decimal("300.00"),
-                    sale_price=Decimal("500.00"),
-                    subtotal=Decimal("1500.00")
-                )
-            ]
-        )
-    ]
+    # Setup mock - create mock SalesHistory with sale_items
+    sale_id = uuid4()
+    item_id = uuid4()
+    product_id = uuid4()
+
+    mock_sale_item = Mock()
+    mock_sale_item.id = item_id
+    mock_sale_item.sale_id = sale_id
+    mock_sale_item.product_id = product_id
+    mock_sale_item.product_name = "Test Product"
+    mock_sale_item.quantity = 3
+    mock_sale_item.unit_cost = Decimal("300.00")
+    mock_sale_item.sale_price = Decimal("500.00")
+    mock_sale_item.subtotal = Decimal("1500.00")
+
+    mock_sale = Mock()
+    mock_sale.id = sale_id
+    mock_sale.total_amount = Decimal("1500.00")
+    mock_sale.timestamp = datetime.now(UTC)
+    mock_sale.sale_items = [mock_sale_item]
+
+    mock_sales_history_service.get_sales_history.return_value = [mock_sale]
 
     # Execute
     response = client.get("/api/sales/history")
@@ -222,7 +224,7 @@ def test_get_sales_history_all(client, mock_sales_history_service):
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 1
-    assert data[0]["sale_id"] == sale_id
+    assert data[0]["sale_id"] == str(sale_id)
     assert data[0]["total_amount"] == "1500.00"
     assert len(data[0]["items"]) == 1
 

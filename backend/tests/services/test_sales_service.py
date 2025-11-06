@@ -14,7 +14,7 @@ from app.services.sales_service import (
 from app.services.inventory_service import StockCheckResult
 from app.models.product import Product
 from app.models.set_item import SetItem
-from app.repositories.product_repository import InsufficientStockError
+from app.exceptions import InsufficientStockError
 
 
 class TestSalesService:
@@ -98,7 +98,7 @@ class TestSalesService:
             is_available=True,
             insufficient_items=[],
         )
-        mock_sales_history_repo.create_transaction.return_value = Mock(
+        mock_sales_history_repo.create_sale.return_value = Mock(
             id=uuid4(),
             total_amount=Decimal("1000"),
             timestamp=datetime.now(),
@@ -110,11 +110,11 @@ class TestSalesService:
         # Verify
         assert result.total_amount == Decimal("1000")
         mock_product_repo.decrement_stock.assert_called_once_with(product_id, 2, mock_db)
-        mock_sales_history_repo.create_transaction.assert_called_once()
+        mock_sales_history_repo.create_sale.assert_called_once()
 
     # Test 2: Insufficient stock error
     def test_process_checkout_insufficient_stock(
-        self, sales_service, mock_inventory_service, mock_db
+        self, sales_service, mock_product_repo, mock_inventory_service, mock_db
     ):
         """Test checkout with insufficient stock.
 
@@ -122,8 +122,19 @@ class TestSalesService:
         Expected: InsufficientStockError raised
         """
         product_id = uuid4()
+        product = Product(
+            id=product_id,
+            name="test product",
+            unit_cost=Decimal("100"),
+            sale_price=Decimal("200"),
+            current_stock=3,  # Only 3 available
+            product_type="single",
+        )
+
         checkout_items = [CheckoutItem(product_id=product_id, quantity=5)]
 
+        # Mock product repository
+        mock_product_repo.get_by_id.return_value = product
         mock_inventory_service.check_stock_availability.return_value = StockCheckResult(
             is_available=False,
             insufficient_items=[product_id],
@@ -194,7 +205,7 @@ class TestSalesService:
             is_available=True,
             insufficient_items=[],
         )
-        mock_sales_history_repo.create_transaction.return_value = Mock(
+        mock_sales_history_repo.create_sale.return_value = Mock(
             id=uuid4(),
             total_amount=Decimal("800"),
             timestamp=datetime.now(),
@@ -249,7 +260,7 @@ class TestSalesService:
             is_available=True,
             insufficient_items=[],
         )
-        mock_sales_history_repo.create_transaction.return_value = Mock(
+        mock_sales_history_repo.create_sale.return_value = Mock(
             id=uuid4(),
             total_amount=Decimal("1400"),  # 500*2 + 400*1
             timestamp=datetime.now(),
@@ -304,7 +315,7 @@ class TestSalesService:
         )
 
         # Simulate error during transaction creation
-        mock_sales_history_repo.create_transaction.side_effect = Exception("Database error")
+        mock_sales_history_repo.create_sale.side_effect = Exception("Database error")
 
         with pytest.raises(Exception):
             sales_service.process_checkout(checkout_items, mock_db)
@@ -339,7 +350,7 @@ class TestSalesService:
             is_available=True,
             insufficient_items=[],
         )
-        mock_sales_history_repo.create_transaction.return_value = Mock(
+        mock_sales_history_repo.create_sale.return_value = Mock(
             id=uuid4(),
             total_amount=Decimal("1000"),
             timestamp=datetime.now(),
@@ -347,10 +358,10 @@ class TestSalesService:
 
         sales_service.process_checkout(checkout_items, mock_db)
 
-        # Verify create_transaction was called with correct price snapshot
-        call_args = mock_sales_history_repo.create_transaction.call_args
+        # Verify create_sale was called with correct price snapshot
+        call_args = mock_sales_history_repo.create_sale.call_args
         # Check keyword arguments
-        items_arg = call_args.kwargs["items"]
+        items_arg = call_args.kwargs["sale_items_data"]
 
         assert len(items_arg) == 1
         assert items_arg[0]["product_name"] == "からあげ弁当"

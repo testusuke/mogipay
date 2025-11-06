@@ -47,11 +47,14 @@ def app_with_db(postgres_container):
 
     # Import app and override dependency
     from app.main import app
+    # Clear any existing overrides from other tests
+    app.dependency_overrides.clear()
     app.dependency_overrides[get_db] = override_get_db
 
     yield app
 
     # Cleanup
+    app.dependency_overrides.clear()
     Base.metadata.drop_all(engine)
     engine.dispose()
     del os.environ["DATABASE_URL"]
