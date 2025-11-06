@@ -179,48 +179,78 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-bold">在庫状況</h2>
           <Card>
             <CardHeader>
-              <CardTitle>商品別在庫</CardTitle>
+              <CardTitle>商品別在庫 (単品商品のみ)</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {data.inventory.products.map((product) => (
-                  <div
-                    key={product.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold">{product.name}</p>
-                        <Badge
-                          variant={
-                            product.product_type === 'set'
-                              ? 'default'
-                              : 'secondary'
-                          }
-                        >
-                          {product.product_type === 'set' ? 'セット' : '単品'}
-                        </Badge>
-                        {product.is_out_of_stock && (
-                          <Badge variant="destructive">在庫切れ</Badge>
-                        )}
-                      </div>
-                      <div className="mt-2 space-y-1">
-                        <div className="flex items-center justify-between text-sm text-muted-foreground">
-                          <span>在庫率</span>
-                          <span>{(product.stock_rate * 100).toFixed(1)}%</span>
-                        </div>
-                        <Progress value={product.stock_rate * 100} />
-                        <p className="text-sm text-muted-foreground">
-                          残り: {product.current_stock} /{' '}
-                          {product.initial_stock}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart
+                  data={data.inventory.products
+                    .filter((p) => p.product_type === 'single')
+                    .map((product) => ({
+                      name: product.name,
+                      sold: product.initial_stock - product.current_stock,
+                      remaining: product.current_stock,
+                      total: product.initial_stock,
+                    }))}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" width={90} />
+                  <Tooltip
+                    formatter={(value: number, name: string) => {
+                      const label =
+                        name === 'sold'
+                          ? '販売済み'
+                          : name === 'remaining'
+                            ? '残り在庫'
+                            : name;
+                      return [value, label];
+                    }}
+                  />
+                  <Bar dataKey="sold" stackId="a" fill="#ef4444" name="販売済み" />
+                  <Bar
+                    dataKey="remaining"
+                    stackId="a"
+                    fill="#22c55e"
+                    name="残り在庫"
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-[#ef4444] rounded"></div>
+                  <span>販売済み</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-[#22c55e] rounded"></div>
+                  <span>残り在庫</span>
+                </div>
               </div>
             </CardContent>
           </Card>
+
+          {/* Out of Stock Products */}
+          {data.inventory.products.some((p) => p.is_out_of_stock) && (
+            <Card>
+              <CardHeader>
+                <CardTitle>在庫切れ商品</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {data.inventory.products
+                    .filter((p) => p.is_out_of_stock)
+                    .map((product) => (
+                      <Badge key={product.id} variant="destructive">
+                        {product.name}
+                        {product.product_type === 'set' && ' (セット)'}
+                      </Badge>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 
