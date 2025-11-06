@@ -163,7 +163,7 @@
   - モックを使用した単体テスト（7テスト全てパス）
   - _Requirements: 6.1-6.5_
 
-- [ ] 4. バックエンド - API 層の実装(TDD)
+- [x] 4. バックエンド - API 層の実装(TDD)
 - [x] 4.1 ProductController の実装(TDD)
 
   - 商品登録 API エンドポイントの実装
@@ -175,28 +175,29 @@
   - HTTP レスポンスとエラーハンドリングのテスト(13テスト全てパス)
   - _Requirements: 1.1-1.6, 2.1-2.4_
 
-- [ ] 4.2 SalesController の実装(TDD)
+- [x] 4.2 SalesController の実装(TDD)
 
   - レジ精算 API エンドポイントの実装
   - 販売履歴取得 API の実装
   - 売上サマリ取得 API の実装
   - バリデーションエラーの HTTP レスポンステスト
   - 在庫不足エラーの HTTP レスポンステスト
+  - HTTP レスポンスとエラーハンドリングのテスト(9テスト全てパス)
   - _Requirements: 3.1-3.8, 4.1-4.4, 5.1-5.5_
 
-- [ ] 4.3 InventoryController の実装(TDD)
+- [x] 4.3 InventoryController の実装(TDD)
 
   - 在庫状況取得 API エンドポイントの実装
   - 単品とセットの在庫数を含むレスポンス
   - 在庫切れ商品の識別フラグを含む
-  - HTTP レスポンスのテスト
+  - HTTP レスポンスのテスト(4テスト全てパス)
   - _Requirements: 7.1-7.7_
 
-- [ ] 4.4 FinancialController の実装(TDD)
+- [x] 4.4 FinancialController の実装(TDD)
 
   - 損益サマリ取得 API エンドポイントの実装
   - 初期費用、売上、損益、損益分岐点達成状態のレスポンス
-  - HTTP レスポンスのテスト
+  - HTTP レスポンスのテスト(5テスト全てパス)
   - _Requirements: 6.1-6.5_
 
 - [ ] 5. バックエンド統合テスト
