@@ -2,7 +2,6 @@
 
 from typing import Optional, List, Dict, Any, Tuple
 from uuid import UUID
-from decimal import Decimal
 from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
@@ -20,7 +19,7 @@ class SalesHistoryRepository:
 
     def create_sale(
         self,
-        total_amount: Decimal,
+        total_amount: int,
         sale_items_data: List[Dict[str, Any]],
         db: Session,
     ) -> SalesHistory:
@@ -98,7 +97,7 @@ class SalesHistoryRepository:
         result = db.execute(stmt)
         return list(result.scalars().all())
 
-    def get_total_sales(self, db: Session) -> Decimal:
+    def get_total_sales(self, db: Session) -> int:
         """Calculate total sales amount across all transactions.
 
         Args:
@@ -110,9 +109,9 @@ class SalesHistoryRepository:
         stmt = select(func.sum(SalesHistory.total_amount))
         result = db.execute(stmt)
         total = result.scalar_one_or_none()
-        return total if total is not None else Decimal("0.00")
+        return total if total is not None else 0
 
-    def get_daily_sales(self, db: Session) -> List[Tuple[datetime.date, Decimal]]:
+    def get_daily_sales(self, db: Session) -> List[Tuple[datetime.date, int]]:
         """Get daily sales summary.
 
         Args:

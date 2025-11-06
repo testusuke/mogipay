@@ -64,7 +64,7 @@ def test_set_product_inventory_sync(client):
         "items": [{"product_id": set_id, "quantity": 1}]
     })
     assert response.status_code == 200
-    assert response.json(["total_amount"]) == 500
+    assert response.json()["total_amount"] == "500"
 
     # Step 5: Verify component inventory deduction
     response = client.get("/api/inventory/status")
@@ -248,7 +248,7 @@ def test_mixed_single_and_set_product_sale(client):
         ]
     })
     assert response.status_code == 200
-    assert response.json(["total_amount"]) == 450  # 250 + (100*2)
+    assert response.json()["total_amount"] == "450"  # 250 + (100*2)
 
     # Verify inventory
     response = client.get("/api/inventory/status")

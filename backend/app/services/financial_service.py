@@ -1,6 +1,5 @@
 """Financial service for profit and loss calculations."""
 
-from decimal import Decimal
 from dataclasses import dataclass
 from sqlalchemy.orm import Session
 
@@ -20,9 +19,9 @@ class FinancialSummary:
         break_even_achieved: Whether profit >= 0
     """
 
-    total_cost: Decimal
-    total_revenue: Decimal
-    profit: Decimal
+    total_cost: int
+    total_revenue: int
+    profit: int
     profit_rate: float
     break_even_achieved: bool
 
@@ -76,7 +75,7 @@ class FinancialService:
         """
         # Calculate total cost
         products = self.product_repo.get_all(db=db)
-        total_cost = Decimal("0")
+        total_cost = 0
 
         for product in products:
             product_cost = product.initial_stock * product.unit_cost

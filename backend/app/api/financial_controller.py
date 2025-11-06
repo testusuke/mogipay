@@ -22,9 +22,9 @@ class FinancialSummaryResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    total_cost: str = Field(..., description="Total initial cost (Decimal as string)")
-    total_revenue: str = Field(..., description="Total sales revenue (Decimal as string)")
-    profit: str = Field(..., description="Profit/Loss amount (Decimal as string)")
+    total_cost: str = Field(..., description="Total initial cost (Integer as string)")
+    total_revenue: str = Field(..., description="Total sales revenue (Integer as string)")
+    profit: str = Field(..., description="Profit/Loss amount (Integer as string)")
     profit_rate: float = Field(..., description="Profit rate (profit / cost)")
     break_even_achieved: bool = Field(..., description="Whether break-even point is achieved")
 
