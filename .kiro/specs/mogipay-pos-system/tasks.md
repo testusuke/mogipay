@@ -1,13 +1,13 @@
 # 実装計画
 
 - [ ] 1. 開発環境のセットアップ
-- [ ] 1.1 monorepo基本構造の作成
+- [x] 1.1 monorepo基本構造の作成
   - プロジェクトルートにfrontend/とbackend/ディレクトリを作成
   - ルートに.gitignoreを作成(node_modules, .env, __pycache__等)
   - READMEを作成(プロジェクト概要と開発環境構築手順)
   - _Requirements: 全要件の基盤_
 
-- [ ] 1.2 バックエンドプロジェクトの作成
+- [x] 1.2 バックエンドプロジェクトの作成
   - backend/ディレクトリでuv initを実行
   - uv python pin 3.12で Python 3.12を指定
   - uv addコマンドで依存関係を追加(pip installは使わない)
@@ -16,11 +16,11 @@
   - backend/app/ディレクトリ構造を作成(api, services, repositories, models)
   - _Requirements: 9.1-9.6_
 
-- [ ] 1.3 フロントエンドプロジェクトの作成
-  - npx create-next-app@latest frontendでNext.js 14プロジェクトを作成
+- [x] 1.3 フロントエンドプロジェクトの作成
+  - npx shadcn@latest initでNext.js 15プロジェクトを作成
   - TypeScript、App Router、Tailwind CSSを有効化
-  - npx shadcn@latest initでshadcn/uiを導入
-  - 必要なshadcn/uiコンポーネントをインストール(button, card, form等)
+  - shadcn/uiを導入
+  - 必要なshadcn/uiコンポーネントをインストール(button, card, form, input, label, badge, dialog, table)
   - _Requirements: 8.1-8.5_
 
 - [ ] 1.4 開発用Docker Compose(PostgreSQL 18のみ)
