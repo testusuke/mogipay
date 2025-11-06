@@ -341,11 +341,14 @@ export default function POSScreen() {
                     // Calculate stock dynamically (single or set)
                     const stock = calculateSetStock(product);
                     const isOutOfStock = stock === 0;
+                    // Get quantity in cart for this product
+                    const cartItem = cart.find(item => item.productId === product.id);
+                    const quantityInCart = cartItem?.quantity || 0;
 
                     return (
                       <Card
                         key={product.id}
-                        className={`cursor-pointer hover:shadow-lg transition-shadow ${
+                        className={`relative cursor-pointer hover:shadow-lg transition-shadow ${
                           isOutOfStock
                             ? "opacity-50 cursor-not-allowed"
                             : ""
@@ -354,6 +357,12 @@ export default function POSScreen() {
                           !isOutOfStock && addToCart(product)
                         }
                       >
+                        {/* Cart quantity badge - top right corner inside card */}
+                        {quantityInCart > 0 && (
+                          <div className="absolute top-2 right-2 bg-black text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm shadow-lg z-10">
+                            {quantityInCart}
+                          </div>
+                        )}
                         <CardContent className="p-4">
                           <div className="flex justify-between items-start mb-2">
                             <h3 className="font-semibold text-lg">
