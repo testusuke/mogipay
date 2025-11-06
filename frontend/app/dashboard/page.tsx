@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { apiClient } from '@/lib/api';
 import type {
   SalesSummary,
@@ -111,65 +110,64 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Sales Summary Section */}
-      {data.sales && (
+      {/* Financial Summary Section */}
+      {data.financial && (
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">売上進捗</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Total Revenue Card */}
+          <h2 className="text-2xl font-bold">損益計算</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Total Cost Card */}
             <Card>
               <CardHeader>
-                <CardTitle>総売上金額</CardTitle>
+                <CardTitle>総初期費用</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-4xl font-bold">
-                  ¥{data.sales.total_revenue.toLocaleString()}
+                <p className="text-3xl font-bold">
+                  ¥{data.financial.total_cost.toLocaleString()}
                 </p>
               </CardContent>
             </Card>
 
-            {/* Completion Rate Card */}
+            {/* Total Revenue Card */}
             <Card>
               <CardHeader>
-                <CardTitle>完売達成率</CardTitle>
+                <CardTitle>総売上</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">
+                  ¥{data.financial.total_revenue.toLocaleString()}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Profit Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle>損益</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <p className="text-4xl font-bold">
-                    {(data.sales.completion_rate * 100).toFixed(1)}%
+                  <p
+                    className={`text-3xl font-bold ${
+                      data.financial.profit >= 0
+                        ? 'text-green-600'
+                        : 'text-red-600'
+                    }`}
+                  >
+                    {data.financial.profit >= 0 ? '+' : ''}¥
+                    {data.financial.profit.toLocaleString()}
                   </p>
-                  <Progress value={data.sales.completion_rate * 100} />
+                  {data.financial.break_even_achieved && (
+                    <Badge variant="default" className="bg-green-600">
+                      損益分岐点達成
+                    </Badge>
+                  )}
+                  <p className="text-sm text-muted-foreground">
+                    利益率: {data.financial.profit_rate.toFixed(1)}%
+                  </p>
                 </div>
               </CardContent>
             </Card>
           </div>
-
-          {/* Daily Revenue Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>日別売上</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={data.sales.daily_revenue.map((revenue, index) => ({
-                    day: `Day ${index + 1}`,
-                    revenue,
-                  }))}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <Tooltip
-                    formatter={(value: number) =>
-                      `¥${value.toLocaleString()}`
-                    }
-                  />
-                  <Bar dataKey="revenue" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
         </div>
       )}
 
@@ -251,67 +249,6 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           )}
-        </div>
-      )}
-
-      {/* Financial Summary Section */}
-      {data.financial && (
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold">損益計算</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Total Cost Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>総初期費用</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">
-                  ¥{data.financial.total_cost.toLocaleString()}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Total Revenue Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>総売上</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">
-                  ¥{data.financial.total_revenue.toLocaleString()}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Profit Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>損益</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <p
-                    className={`text-3xl font-bold ${
-                      data.financial.profit >= 0
-                        ? 'text-green-600'
-                        : 'text-red-600'
-                    }`}
-                  >
-                    {data.financial.profit >= 0 ? '+' : ''}¥
-                    {data.financial.profit.toLocaleString()}
-                  </p>
-                  {data.financial.break_even_achieved && (
-                    <Badge variant="default" className="bg-green-600">
-                      損益分岐点達成
-                    </Badge>
-                  )}
-                  <p className="text-sm text-muted-foreground">
-                    利益率: {data.financial.profit_rate.toFixed(1)}%
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       )}
     </div>
