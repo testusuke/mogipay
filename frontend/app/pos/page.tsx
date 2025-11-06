@@ -134,7 +134,7 @@ export default function POSScreen() {
         quantity: item.quantity,
       }));
 
-      await apiClient.checkout(items);
+      await apiClient.checkout({ items });
 
       // Clear cart on success
       setCart([]);
