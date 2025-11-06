@@ -1,0 +1,322 @@
+#!/usr/bin/env python3
+"""
+Seed data script for MogiPay - Yakitori (焼き串) Restaurant
+"""
+
+import sys
+from pathlib import Path
+
+# Add parent directory to path to import app modules
+sys.path.append(str(Path(__file__).parent.parent))
+
+from decimal import Decimal
+from app.database import SessionLocal
+from app.models import Product, SetItem
+
+
+def clear_existing_data(db):
+    """Clear all existing data from database"""
+    print("🗑️  Clearing existing data...")
+    try:
+        # Delete in correct order due to foreign key constraints
+        db.query(SetItem).delete()
+        db.query(Product).delete()
+        db.commit()
+        print("✅ Existing data cleared")
+    except Exception as e:
+        db.rollback()
+        print(f"❌ Error clearing data: {e}")
+        raise
+
+
+def create_single_products(db):
+    """Create single products (串単品とドリンク)"""
+    print("\n🍢 Creating single products (串単品 & ドリンク)...")
+
+    products = [
+        # 焼き串単品
+        {
+            "name": "ねぎま串",
+            "unit_cost": Decimal("80"),
+            "sale_price": Decimal("150"),
+            "initial_stock": 100,
+            "current_stock": 100,
+            "product_type": "single",
+        },
+        {
+            "name": "つくね串",
+            "unit_cost": Decimal("70"),
+            "sale_price": Decimal("140"),
+            "initial_stock": 100,
+            "current_stock": 100,
+            "product_type": "single",
+        },
+        {
+            "name": "豚バラ串",
+            "unit_cost": Decimal("90"),
+            "sale_price": Decimal("160"),
+            "initial_stock": 80,
+            "current_stock": 80,
+            "product_type": "single",
+        },
+        {
+            "name": "鶏もも串",
+            "unit_cost": Decimal("85"),
+            "sale_price": Decimal("150"),
+            "initial_stock": 100,
+            "current_stock": 100,
+            "product_type": "single",
+        },
+        {
+            "name": "牛串",
+            "unit_cost": Decimal("150"),
+            "sale_price": Decimal("250"),
+            "initial_stock": 50,
+            "current_stock": 50,
+            "product_type": "single",
+        },
+        {
+            "name": "野菜串",
+            "unit_cost": Decimal("50"),
+            "sale_price": Decimal("100"),
+            "initial_stock": 60,
+            "current_stock": 60,
+            "product_type": "single",
+        },
+        # ドリンク
+        {
+            "name": "お茶",
+            "unit_cost": Decimal("30"),
+            "sale_price": Decimal("100"),
+            "initial_stock": 150,
+            "current_stock": 150,
+            "product_type": "single",
+        },
+        {
+            "name": "コーラ",
+            "unit_cost": Decimal("50"),
+            "sale_price": Decimal("150"),
+            "initial_stock": 100,
+            "current_stock": 100,
+            "product_type": "single",
+        },
+        {
+            "name": "オレンジジュース",
+            "unit_cost": Decimal("50"),
+            "sale_price": Decimal("150"),
+            "initial_stock": 100,
+            "current_stock": 100,
+            "product_type": "single",
+        },
+        # サイドメニュー
+        {
+            "name": "枝豆",
+            "unit_cost": Decimal("80"),
+            "sale_price": Decimal("200"),
+            "initial_stock": 50,
+            "current_stock": 50,
+            "product_type": "single",
+        },
+        {
+            "name": "キャベツ",
+            "unit_cost": Decimal("60"),
+            "sale_price": Decimal("150"),
+            "initial_stock": 50,
+            "current_stock": 50,
+            "product_type": "single",
+        },
+    ]
+
+    created_products = {}
+
+    for product_data in products:
+        product = Product(**product_data)
+        db.add(product)
+        db.flush()  # Get the ID without committing
+        created_products[product_data["name"]] = product
+        print(f"  ✓ {product_data['name']} (¥{product_data['sale_price']}, 在庫: {product_data['initial_stock']})")
+
+    db.commit()
+    print(f"✅ Created {len(products)} single products")
+
+    return created_products
+
+
+def create_set_products(db, single_products):
+    """Create set products (セット商品)"""
+    print("\n🍱 Creating set products (セット商品)...")
+
+    # 串盛り合わせセット (5本セット)
+    set_product_1 = Product(
+        name="串盛り合わせセット",
+        unit_cost=Decimal("400"),
+        sale_price=Decimal("650"),
+        initial_stock=0,  # セット商品は仮想在庫
+        current_stock=0,
+        product_type="set",
+    )
+    db.add(set_product_1)
+    db.flush()
+
+    set_items_1 = [
+        SetItem(
+            set_product_id=set_product_1.id,
+            item_product_id=single_products["ねぎま串"].id,
+            quantity=1,
+        ),
+        SetItem(
+            set_product_id=set_product_1.id,
+            item_product_id=single_products["つくね串"].id,
+            quantity=1,
+        ),
+        SetItem(
+            set_product_id=set_product_1.id,
+            item_product_id=single_products["豚バラ串"].id,
+            quantity=1,
+        ),
+        SetItem(
+            set_product_id=set_product_1.id,
+            item_product_id=single_products["鶏もも串"].id,
+            quantity=1,
+        ),
+        SetItem(
+            set_product_id=set_product_1.id,
+            item_product_id=single_products["野菜串"].id,
+            quantity=1,
+        ),
+    ]
+    for item in set_items_1:
+        db.add(item)
+
+    print(f"  ✓ {set_product_1.name} (¥{set_product_1.sale_price})")
+    print(f"    - ねぎま串 x1, つくね串 x1, 豚バラ串 x1, 鶏もも串 x1, 野菜串 x1")
+
+    # 串ドリンクセット
+    set_product_2 = Product(
+        name="串ドリンクセット",
+        unit_cost=Decimal("130"),
+        sale_price=Decimal("250"),
+        initial_stock=0,
+        current_stock=0,
+        product_type="set",
+    )
+    db.add(set_product_2)
+    db.flush()
+
+    set_items_2 = [
+        SetItem(
+            set_product_id=set_product_2.id,
+            item_product_id=single_products["ねぎま串"].id,
+            quantity=2,
+        ),
+        SetItem(
+            set_product_id=set_product_2.id,
+            item_product_id=single_products["お茶"].id,
+            quantity=1,
+        ),
+    ]
+    for item in set_items_2:
+        db.add(item)
+
+    print(f"  ✓ {set_product_2.name} (¥{set_product_2.sale_price})")
+    print(f"    - ねぎま串 x2, お茶 x1")
+
+    # 豪華串セット
+    set_product_3 = Product(
+        name="豪華串セット",
+        unit_cost=Decimal("500"),
+        sale_price=Decimal("800"),
+        initial_stock=0,
+        current_stock=0,
+        product_type="set",
+    )
+    db.add(set_product_3)
+    db.flush()
+
+    set_items_3 = [
+        SetItem(
+            set_product_id=set_product_3.id,
+            item_product_id=single_products["牛串"].id,
+            quantity=2,
+        ),
+        SetItem(
+            set_product_id=set_product_3.id,
+            item_product_id=single_products["鶏もも串"].id,
+            quantity=1,
+        ),
+        SetItem(
+            set_product_id=set_product_3.id,
+            item_product_id=single_products["野菜串"].id,
+            quantity=1,
+        ),
+        SetItem(
+            set_product_id=set_product_3.id,
+            item_product_id=single_products["コーラ"].id,
+            quantity=1,
+        ),
+    ]
+    for item in set_items_3:
+        db.add(item)
+
+    print(f"  ✓ {set_product_3.name} (¥{set_product_3.sale_price})")
+    print(f"    - 牛串 x2, 鶏もも串 x1, 野菜串 x1, コーラ x1")
+
+    db.commit()
+    print("✅ Created 3 set products")
+
+
+def main():
+    """Main seed data execution"""
+    print("=" * 60)
+    print("🍢 MogiPay Seed Data - 焼き串屋さん Edition")
+    print("=" * 60)
+
+    db = SessionLocal()
+
+    try:
+        # Clear existing data
+        clear_existing_data(db)
+
+        # Create single products
+        single_products = create_single_products(db)
+
+        # Create set products
+        create_set_products(db, single_products)
+
+        # Summary
+        print("\n" + "=" * 60)
+        print("✅ Seed data created successfully!")
+        print("=" * 60)
+        print("\n📊 Summary:")
+
+        total_products = db.query(Product).count()
+        single_count = db.query(Product).filter(Product.product_type == "single").count()
+        set_count = db.query(Product).filter(Product.product_type == "set").count()
+
+        print(f"  Total products: {total_products}")
+        print(f"  - Single products: {single_count}")
+        print(f"  - Set products: {set_count}")
+
+        # Calculate initial investment
+        total_cost = db.query(Product).filter(Product.product_type == "single").all()
+        total_investment = sum(p.initial_stock * p.unit_cost for p in total_cost)
+
+        print(f"\n💰 Initial Investment: ¥{total_investment:,}")
+
+        print("\n🚀 Ready to start! Run:")
+        print("  Terminal 1: make db-up (if not running)")
+        print("  Terminal 2: make backend-dev")
+        print("  Terminal 3: make frontend-dev")
+
+    except Exception as e:
+        db.rollback()
+        print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+    finally:
+        db.close()
+
+
+if __name__ == "__main__":
+    main()

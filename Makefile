@@ -1,4 +1,4 @@
-.PHONY: help db-up db-down backend-dev frontend-dev test migrate setup clean
+.PHONY: help db-up db-down backend-dev frontend-dev test migrate seed setup clean
 
 # Default target
 help:
@@ -17,6 +17,7 @@ help:
 	@echo ""
 	@echo "Database Management:"
 	@echo "  make migrate         - Run database migrations"
+	@echo "  make seed            - Insert seed data (焼き串屋さん)"
 	@echo ""
 	@echo "Setup & Cleanup:"
 	@echo "  make setup           - Initial project setup"
@@ -48,6 +49,10 @@ test:
 # Run database migrations
 migrate:
 	cd backend && uv run alembic upgrade head
+
+# Insert seed data
+seed:
+	cd backend && uv run python scripts/seed_data.py
 
 # Initial project setup
 setup: db-up
