@@ -105,9 +105,9 @@ class SetItemResponse(BaseModel):
         quantity: Quantity of the component in the set
     """
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
-    product_id: UUID
+    product_id: UUID = Field(..., validation_alias="item_product_id")
     quantity: int
 
 

@@ -7,10 +7,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from sqlalchemy.orm import Session
 
-from app.repositories.product_repository import (
-    ProductRepository,
-    InsufficientStockError,
-)
+from app.repositories.product_repository import ProductRepository
+from app.exceptions import InsufficientStockError
 from app.repositories.sales_history_repository import SalesHistoryRepository
 from app.repositories.set_item_repository import SetItemRepository
 from app.services.inventory_service import InventoryService
@@ -135,9 +133,17 @@ class SalesService:
         )
 
         if not stock_check.is_available:
-            insufficient_ids = ", ".join(str(id) for id in stock_check.insufficient_items)
+            # Get first insufficient product details
+            first_insufficient_id = stock_check.insufficient_items[0]
+            # Find the requested quantity for this product
+            requested_item = next(i for i in items if str(i.product_id) == str(first_insufficient_id))
+            # Get product to check available stock
+            product = self.product_repo.get_by_id(first_insufficient_id, db)
+
             raise InsufficientStockError(
-                f"Insufficient stock for products: {insufficient_ids}"
+                product_id=str(first_insufficient_id),
+                requested=requested_item.quantity,
+                available=product.current_stock if product else 0
             )
 
         # Step 3: Begin transaction
@@ -163,9 +169,9 @@ class SalesService:
                 })
 
             # Step 5: Create sales history
-            sale_transaction = self.sales_history_repo.create_transaction(
-                items=sales_items,
+            sale_transaction = self.sales_history_repo.create_sale(
                 total_amount=total_amount,
+                sale_items_data=sales_items,
                 db=db,
             )
 

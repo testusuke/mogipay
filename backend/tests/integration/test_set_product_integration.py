@@ -50,7 +50,7 @@ def test_set_product_inventory_sync(client):
             {"product_id": item2_id, "quantity": 1}
         ]
     })
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Set product creation failed: {response.status_code} - {response.json()}"
     set_id = response.json()["id"]
 
     # Step 3: Verify set inventory calculation
@@ -64,7 +64,7 @@ def test_set_product_inventory_sync(client):
         "items": [{"product_id": set_id, "quantity": 1}]
     })
     assert response.status_code == 200
-    assert response.json()["total_amount"] == 500
+    assert float(response.json()["total_amount"]) == 500
 
     # Step 5: Verify component inventory deduction
     response = client.get("/api/inventory/status")
@@ -124,7 +124,7 @@ def test_set_product_insufficient_component_stock(client):
     })
     assert response.status_code == 400
     error_data = response.json()
-    assert error_data["error_code"] == "INSUFFICIENT_STOCK"
+    assert error_data["detail"]["error_code"] == "INSUFFICIENT_STOCK"
 
     # Verify component stock unchanged (transaction rollback)
     response = client.get("/api/inventory/status")
@@ -248,7 +248,7 @@ def test_mixed_single_and_set_product_sale(client):
         ]
     })
     assert response.status_code == 200
-    assert response.json()["total_amount"] == 450  # 250 + (100*2)
+    assert float(response.json()["total_amount"]) == 450  # 250 + (100*2)
 
     # Verify inventory
     response = client.get("/api/inventory/status")

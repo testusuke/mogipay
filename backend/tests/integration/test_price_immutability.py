@@ -33,7 +33,7 @@ def test_price_change_immutability(client):
     })
     assert response.status_code == 200
     old_sale_id = response.json()["sale_id"]
-    assert response.json()["total_amount"] == 200
+    assert float(response.json()["total_amount"]) == 200
 
     # Step 3: Change price to 300
     response = client.put(f"/api/products/{product_id}/price", json={
@@ -44,7 +44,7 @@ def test_price_change_immutability(client):
     # Step 4: Verify product price is updated
     response = client.get(f"/api/products/{product_id}")
     assert response.status_code == 200
-    assert response.json()["sale_price"] == 300
+    assert float(response.json()["sale_price"]) == 300
 
     # Step 5: Make a new sale at new price (300)
     response = client.post("/api/sales/checkout", json={
@@ -52,18 +52,18 @@ def test_price_change_immutability(client):
     })
     assert response.status_code == 200
     new_sale_id = response.json()["sale_id"]
-    assert response.json()["total_amount"] == 300
+    assert float(response.json()["total_amount"]) == 300
 
     # Step 6: Verify sales history - old sale still shows 200, new sale shows 300
     response = client.get("/api/sales/history")
     assert response.status_code == 200
     history = {h["sale_id"]: h for h in response.json()}
 
-    assert history[old_sale_id]["total_amount"] == 200
-    assert history[old_sale_id]["items"][0]["sale_price"] == 200
+    assert float(history[old_sale_id]["total_amount"]) == 200
+    assert float(history[old_sale_id]["items"][0]["sale_price"]) == 200
 
-    assert history[new_sale_id]["total_amount"] == 300
-    assert history[new_sale_id]["items"][0]["sale_price"] == 300
+    assert float(history[new_sale_id]["total_amount"]) == 300
+    assert float(history[new_sale_id]["items"][0]["sale_price"]) == 300
 
 
 # 🔴 RED: Test multiple price changes
@@ -87,7 +87,7 @@ def test_multiple_price_changes(client):
         "items": [{"product_id": product_id, "quantity": 2}]
     })
     sale1_id = response.json()["sale_id"]
-    assert response.json()["total_amount"] == 500  # 250 * 2
+    assert float(response.json()["total_amount"]) == 500  # 250 * 2
 
     # Change price to 300
     client.put(f"/api/products/{product_id}/price", json={"sale_price": 300})
@@ -97,7 +97,7 @@ def test_multiple_price_changes(client):
         "items": [{"product_id": product_id, "quantity": 3}]
     })
     sale2_id = response.json()["sale_id"]
-    assert response.json()["total_amount"] == 900  # 300 * 3
+    assert float(response.json()["total_amount"]) == 900  # 300 * 3
 
     # Change price to 350
     client.put(f"/api/products/{product_id}/price", json={"sale_price": 350})
@@ -107,20 +107,20 @@ def test_multiple_price_changes(client):
         "items": [{"product_id": product_id, "quantity": 1}]
     })
     sale3_id = response.json()["sale_id"]
-    assert response.json()["total_amount"] == 350  # 350 * 1
+    assert float(response.json()["total_amount"]) == 350  # 350 * 1
 
     # Verify all sales have correct prices
     response = client.get("/api/sales/history")
     history = {h["sale_id"]: h for h in response.json()}
 
-    assert history[sale1_id]["items"][0]["sale_price"] == 250
-    assert history[sale2_id]["items"][0]["sale_price"] == 300
-    assert history[sale3_id]["items"][0]["sale_price"] == 350
+    assert float(history[sale1_id]["items"][0]["sale_price"]) == 250
+    assert float(history[sale2_id]["items"][0]["sale_price"]) == 300
+    assert float(history[sale3_id]["items"][0]["sale_price"]) == 350
 
     # Verify financial summary uses actual sale prices
     response = client.get("/api/financial/summary")
     summary = response.json()
-    assert summary["total_revenue"] == 1750  # 500 + 900 + 350
+    assert float(summary["total_revenue"]) == 1750  # 500 + 900 + 350
 
 
 # 🔴 RED: Test price change with set products
@@ -155,7 +155,7 @@ def test_price_change_immutability_set_product(client):
         "items": [{"product_id": set_id, "quantity": 1}]
     })
     old_sale_id = response.json()["sale_id"]
-    assert response.json()["total_amount"] == 400
+    assert float(response.json()["total_amount"]) == 400
 
     # Change set product price to 500
     client.put(f"/api/products/{set_id}/price", json={"sale_price": 500})
@@ -165,14 +165,14 @@ def test_price_change_immutability_set_product(client):
         "items": [{"product_id": set_id, "quantity": 1}]
     })
     new_sale_id = response.json()["sale_id"]
-    assert response.json()["total_amount"] == 500
+    assert float(response.json()["total_amount"]) == 500
 
     # Verify sales history
     response = client.get("/api/sales/history")
     history = {h["sale_id"]: h for h in response.json()}
 
-    assert history[old_sale_id]["total_amount"] == 400
-    assert history[new_sale_id]["total_amount"] == 500
+    assert float(history[old_sale_id]["total_amount"]) == 400
+    assert float(history[new_sale_id]["total_amount"]) == 500
 
 
 # 🔴 RED: Test unit cost change immutability
@@ -210,8 +210,8 @@ def test_unit_cost_immutability(client):
     response = client.get("/api/sales/history")
     history = response.json()
     sale = next(h for h in history if h["sale_id"] == sale_id)
-    assert sale["items"][0]["unit_cost"] == 120  # Original cost
-    assert sale["items"][0]["sale_price"] == 250  # Original price
+    assert float(sale["items"][0]["unit_cost"]) == 120  # Original cost
+    assert float(sale["items"][0]["sale_price"]) == 250  # Original price
 
 
 # 🔴 RED: Test financial calculation with price changes
@@ -232,7 +232,7 @@ def test_financial_calculation_with_price_changes(client):
 
     # Initial cost = 100 * 10 = 1000
     response = client.get("/api/financial/summary")
-    assert response.json()["total_cost"] == 1000
+    assert float(response.json()["total_cost"]) == 1000
 
     # Sale 1: 3 items at 200 each
     client.post("/api/sales/checkout", json={
@@ -242,8 +242,8 @@ def test_financial_calculation_with_price_changes(client):
     # Revenue = 600, Profit = 600 - 1000 = -400
     response = client.get("/api/financial/summary")
     summary = response.json()
-    assert summary["total_revenue"] == 600
-    assert summary["profit"] == -400
+    assert float(summary["total_revenue"]) == 600
+    assert float(summary["profit"]) == -400
     assert summary["break_even_achieved"] is False
 
     # Change price to 300
@@ -257,6 +257,6 @@ def test_financial_calculation_with_price_changes(client):
     # Revenue = 600 + 1500 = 2100, Profit = 2100 - 1000 = 1100
     response = client.get("/api/financial/summary")
     summary = response.json()
-    assert summary["total_revenue"] == 2100
-    assert summary["profit"] == 1100
+    assert float(summary["total_revenue"]) == 2100
+    assert float(summary["profit"]) == 1100
     assert summary["break_even_achieved"] is True

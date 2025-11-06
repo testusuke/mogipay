@@ -164,7 +164,7 @@ async def checkout(
 
         # Convert response
         return CheckoutResponse(
-            sale_id=str(transaction.id),
+            sale_id=str(transaction.sale_id),
             total_amount=str(transaction.total_amount),
             timestamp=transaction.timestamp,
         )
@@ -238,7 +238,7 @@ async def get_sales_history(
                     sale_price=str(item.sale_price),
                     subtotal=str(item.subtotal),
                 )
-                for item in t.items
+                for item in t.sale_items
             ],
         )
         for t in transactions
