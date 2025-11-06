@@ -280,12 +280,15 @@
   - 商品編集と削除機能
   - 価格変更機能
   - バリデーションとエラー表示
+  - レスポンシブデザイン対応
+    - デスクトップ（md以上）: テーブル表示
+    - モバイル（md未満）: Card表示で見やすく改善
   - frontend/app/products/page.tsx 実装完了
   - Table, Select コンポーネント追加
   - ナビゲーションメニューに商品管理リンク追加
   - ESLint チェック合格
   - TypeScript 型チェック合格
-  - _Requirements: 1.1-1.6, 2.1-2.4_
+  - _Requirements: 1.1-1.6, 2.1-2.4, 8.1, 8.3_
 
 - [x] 6.5 SalesDashboard(売上ダッシュボード)の実装
 
