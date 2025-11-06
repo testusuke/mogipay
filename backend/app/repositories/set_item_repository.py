@@ -70,6 +70,9 @@ class SetItemRepository:
     ) -> List[SetItem]:
         """Create multiple set items in bulk.
 
+        NOTE: This method does NOT commit the transaction.
+        The caller (Service layer) is responsible for transaction management.
+
         Args:
             set_product_id: Set product UUID
             items_data: List of dicts with item_product_id and quantity
@@ -91,11 +94,8 @@ class SetItemRepository:
             db.add(set_item)
             set_items.append(set_item)
 
-        db.commit()
-
-        # Refresh all created items
-        for set_item in set_items:
-            db.refresh(set_item)
+        # NOTE: No commit here! Service layer manages the transaction.
+        db.flush()  # Ensure all inserts are ready
 
         return set_items
 

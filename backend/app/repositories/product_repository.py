@@ -149,6 +149,9 @@ class ProductRepository:
         This method uses SELECT FOR UPDATE to prevent race conditions
         during concurrent stock decrements.
 
+        NOTE: This method does NOT commit the transaction.
+        The caller (Service layer) is responsible for transaction management.
+
         Args:
             product_id: Product UUID
             quantity: Quantity to decrement
@@ -177,6 +180,6 @@ class ProductRepository:
 
         # Decrement stock
         product.current_stock -= quantity
-        db.commit()
-        db.refresh(product)
+        # NOTE: No commit here! Service layer manages the transaction.
+        db.flush()  # Ensure changes are ready
         return product

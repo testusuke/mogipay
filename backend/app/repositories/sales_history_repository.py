@@ -25,6 +25,9 @@ class SalesHistoryRepository:
     ) -> SalesHistory:
         """Create a new sales transaction with sale items.
 
+        NOTE: This method does NOT commit the transaction.
+        The caller (Service layer) is responsible for transaction management.
+
         Args:
             total_amount: Total amount of the sale
             sale_items_data: List of dicts with sale item data
@@ -39,7 +42,7 @@ class SalesHistoryRepository:
         # Create sales history
         sales = SalesHistory(total_amount=total_amount)
         db.add(sales)
-        db.flush()  # Get the sales ID
+        db.flush()  # Get the sales ID for sale_items
 
         # Create sale items
         for item_data in sale_items_data:
@@ -54,8 +57,8 @@ class SalesHistoryRepository:
             )
             db.add(sale_item)
 
-        db.commit()
-        db.refresh(sales)
+        # NOTE: No commit here! Service layer manages the transaction.
+        db.flush()  # Ensure all inserts are ready
         return sales
 
     def get_by_id(self, sales_id: UUID, db: Session) -> Optional[SalesHistory]:
