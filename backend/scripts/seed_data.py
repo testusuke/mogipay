@@ -31,97 +31,31 @@ def clear_existing_data(db):
 
 
 def create_single_products(db):
-    """Create single products (串単品とドリンク)"""
-    print("\n🍢 Creating single products (串単品 & ドリンク)...")
+    """Create single products (串単品)"""
+    print("\n🍢 Creating single products (串単品)...")
 
     products = [
         # 焼き串単品
         {
-            "name": "ねぎま串",
-            "unit_cost": 80,
-            "sale_price": 150,
-            "initial_stock": 100,
-            "current_stock": 100,
-            "product_type": "single",
-        },
-        {
-            "name": "つくね串",
-            "unit_cost": 70,
-            "sale_price": 140,
-            "initial_stock": 100,
-            "current_stock": 100,
+            "name": "牛カルビ串",
+            "unit_cost": 162,
+            "sale_price": 400,
+            "initial_stock": 200,
+            "current_stock": 200,
             "product_type": "single",
         },
         {
             "name": "豚バラ串",
-            "unit_cost": 90,
-            "sale_price": 160,
-            "initial_stock": 80,
-            "current_stock": 80,
-            "product_type": "single",
-        },
-        {
-            "name": "鶏もも串",
-            "unit_cost": 85,
-            "sale_price": 150,
-            "initial_stock": 100,
-            "current_stock": 100,
-            "product_type": "single",
-        },
-        {
-            "name": "牛串",
-            "unit_cost": 150,
-            "sale_price": 250,
-            "initial_stock": 50,
-            "current_stock": 50,
+            "unit_cost": 71,
+            "sale_price": 200,
+            "initial_stock": 400,
+            "current_stock": 400,
             "product_type": "single",
         },
         {
             "name": "野菜串",
-            "unit_cost": 50,
-            "sale_price": 100,
-            "initial_stock": 60,
-            "current_stock": 60,
-            "product_type": "single",
-        },
-        # ドリンク
-        {
-            "name": "お茶",
-            "unit_cost": 30,
-            "sale_price": 100,
-            "initial_stock": 150,
-            "current_stock": 150,
-            "product_type": "single",
-        },
-        {
-            "name": "コーラ",
-            "unit_cost": 50,
-            "sale_price": 150,
-            "initial_stock": 100,
-            "current_stock": 100,
-            "product_type": "single",
-        },
-        {
-            "name": "オレンジジュース",
-            "unit_cost": 50,
-            "sale_price": 150,
-            "initial_stock": 100,
-            "current_stock": 100,
-            "product_type": "single",
-        },
-        # サイドメニュー
-        {
-            "name": "枝豆",
-            "unit_cost": 80,
+            "unit_cost": 130,
             "sale_price": 200,
-            "initial_stock": 50,
-            "current_stock": 50,
-            "product_type": "single",
-        },
-        {
-            "name": "キャベツ",
-            "unit_cost": 60,
-            "sale_price": 150,
             "initial_stock": 50,
             "current_stock": 50,
             "product_type": "single",
@@ -147,11 +81,11 @@ def create_set_products(db, single_products):
     """Create set products (セット商品)"""
     print("\n🍱 Creating set products (セット商品)...")
 
-    # 串盛り合わせセット (5本セット)
+    # 牛カルビ串3本セット
     set_product_1 = Product(
-        name="串盛り合わせセット",
-        unit_cost=400,
-        sale_price=650,
+        name="牛カルビ串3本セット",
+        unit_cost=486,  # 162 * 3
+        sale_price=1000,
         initial_stock=0,  # セット商品は仮想在庫
         current_stock=0,
         product_type="set",
@@ -162,41 +96,21 @@ def create_set_products(db, single_products):
     set_items_1 = [
         SetItem(
             set_product_id=set_product_1.id,
-            item_product_id=single_products["ねぎま串"].id,
-            quantity=1,
-        ),
-        SetItem(
-            set_product_id=set_product_1.id,
-            item_product_id=single_products["つくね串"].id,
-            quantity=1,
-        ),
-        SetItem(
-            set_product_id=set_product_1.id,
-            item_product_id=single_products["豚バラ串"].id,
-            quantity=1,
-        ),
-        SetItem(
-            set_product_id=set_product_1.id,
-            item_product_id=single_products["鶏もも串"].id,
-            quantity=1,
-        ),
-        SetItem(
-            set_product_id=set_product_1.id,
-            item_product_id=single_products["野菜串"].id,
-            quantity=1,
+            item_product_id=single_products["牛カルビ串"].id,
+            quantity=3,
         ),
     ]
     for item in set_items_1:
         db.add(item)
 
     print(f"  ✓ {set_product_1.name} (¥{set_product_1.sale_price})")
-    print(f"    - ねぎま串 x1, つくね串 x1, 豚バラ串 x1, 鶏もも串 x1, 野菜串 x1")
+    print(f"    - 牛カルビ串 x3")
 
-    # 串ドリンクセット
+    # 豚バラ串3本セット
     set_product_2 = Product(
-        name="串ドリンクセット",
-        unit_cost=130,
-        sale_price=250,
+        name="豚バラ串3本セット",
+        unit_cost=213,  # 71 * 3
+        sale_price=500,
         initial_stock=0,
         current_stock=0,
         product_type="set",
@@ -207,63 +121,18 @@ def create_set_products(db, single_products):
     set_items_2 = [
         SetItem(
             set_product_id=set_product_2.id,
-            item_product_id=single_products["ねぎま串"].id,
-            quantity=2,
-        ),
-        SetItem(
-            set_product_id=set_product_2.id,
-            item_product_id=single_products["お茶"].id,
-            quantity=1,
+            item_product_id=single_products["豚バラ串"].id,
+            quantity=3,
         ),
     ]
     for item in set_items_2:
         db.add(item)
 
     print(f"  ✓ {set_product_2.name} (¥{set_product_2.sale_price})")
-    print(f"    - ねぎま串 x2, お茶 x1")
-
-    # 豪華串セット
-    set_product_3 = Product(
-        name="豪華串セット",
-        unit_cost=500,
-        sale_price=800,
-        initial_stock=0,
-        current_stock=0,
-        product_type="set",
-    )
-    db.add(set_product_3)
-    db.flush()
-
-    set_items_3 = [
-        SetItem(
-            set_product_id=set_product_3.id,
-            item_product_id=single_products["牛串"].id,
-            quantity=2,
-        ),
-        SetItem(
-            set_product_id=set_product_3.id,
-            item_product_id=single_products["鶏もも串"].id,
-            quantity=1,
-        ),
-        SetItem(
-            set_product_id=set_product_3.id,
-            item_product_id=single_products["野菜串"].id,
-            quantity=1,
-        ),
-        SetItem(
-            set_product_id=set_product_3.id,
-            item_product_id=single_products["コーラ"].id,
-            quantity=1,
-        ),
-    ]
-    for item in set_items_3:
-        db.add(item)
-
-    print(f"  ✓ {set_product_3.name} (¥{set_product_3.sale_price})")
-    print(f"    - 牛串 x2, 鶏もも串 x1, 野菜串 x1, コーラ x1")
+    print(f"    - 豚バラ串 x3")
 
     db.commit()
-    print("✅ Created 3 set products")
+    print("✅ Created 2 set products")
 
 
 def main():
