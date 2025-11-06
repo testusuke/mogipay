@@ -141,7 +141,7 @@ export default function ProductManagement() {
         unit_cost: formData.unitCost,
         sale_price: formData.salePrice,
         initial_stock: formData.initialStock,
-        product_type: formData.productType,
+        // product_type は変更不可（データ整合性のため）
         set_items:
           formData.productType === "set"
             ? formData.setItems.map((item) => ({
@@ -502,9 +502,7 @@ export default function ProductManagement() {
               <Label htmlFor="edit-productType">商品種別</Label>
               <Select
                 value={formData.productType}
-                onValueChange={(value: "single" | "set") =>
-                  setFormData({ ...formData, productType: value })
-                }
+                disabled
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -514,6 +512,9 @@ export default function ProductManagement() {
                   <SelectItem value="set">セット</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-sm text-muted-foreground mt-1">
+                ※ 商品種別は変更できません
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
