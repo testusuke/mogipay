@@ -102,7 +102,8 @@ export default function ProductManagement() {
         name: formData.name,
         unit_cost: formData.unitCost,
         sale_price: formData.salePrice,
-        initial_stock: formData.initialStock,
+        // セット商品の場合は在庫数を0に固定（構成単品から動的計算されるため）
+        initial_stock: formData.productType === "set" ? 0 : formData.initialStock,
         product_type: formData.productType,
         set_items:
           formData.productType === "set"
@@ -140,8 +141,9 @@ export default function ProductManagement() {
         name: formData.name,
         unit_cost: formData.unitCost,
         sale_price: formData.salePrice,
-        initial_stock: formData.initialStock,
+        // セット商品の場合は在庫数を0に固定（構成単品から動的計算されるため）
         // product_type は変更不可（データ整合性のため）
+        initial_stock: formData.productType === "set" ? 0 : formData.initialStock,
         set_items:
           formData.productType === "set"
             ? formData.setItems.map((item) => ({
@@ -409,17 +411,19 @@ export default function ProductManagement() {
                 />
               </div>
             </div>
-            <div>
-              <Label htmlFor="initialStock">初期在庫数</Label>
-              <Input
-                id="initialStock"
-                type="number"
-                value={formData.initialStock}
-                onChange={(e) =>
-                  setFormData({ ...formData, initialStock: Number(e.target.value) })
-                }
-              />
-            </div>
+            {formData.productType === "single" && (
+              <div>
+                <Label htmlFor="initialStock">初期在庫数</Label>
+                <Input
+                  id="initialStock"
+                  type="number"
+                  value={formData.initialStock}
+                  onChange={(e) =>
+                    setFormData({ ...formData, initialStock: Number(e.target.value) })
+                  }
+                />
+              </div>
+            )}
 
             {formData.productType === "set" && (
               <div className="space-y-2">
@@ -540,17 +544,19 @@ export default function ProductManagement() {
                 />
               </div>
             </div>
-            <div>
-              <Label htmlFor="edit-initialStock">初期在庫数</Label>
-              <Input
-                id="edit-initialStock"
-                type="number"
-                value={formData.initialStock}
-                onChange={(e) =>
-                  setFormData({ ...formData, initialStock: Number(e.target.value) })
-                }
-              />
-            </div>
+            {formData.productType === "single" && (
+              <div>
+                <Label htmlFor="edit-initialStock">初期在庫数</Label>
+                <Input
+                  id="edit-initialStock"
+                  type="number"
+                  value={formData.initialStock}
+                  onChange={(e) =>
+                    setFormData({ ...formData, initialStock: Number(e.target.value) })
+                  }
+                />
+              </div>
+            )}
 
             {formData.productType === "set" && (
               <div className="space-y-2">
