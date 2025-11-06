@@ -164,7 +164,7 @@
   - _Requirements: 6.1-6.5_
 
 - [ ] 4. バックエンド - API 層の実装(TDD)
-- [ ] 4.1 ProductController の実装(TDD)
+- [x] 4.1 ProductController の実装(TDD)
 
   - 商品登録 API エンドポイントの実装
   - 商品一覧取得 API の実装
@@ -172,7 +172,7 @@
   - 商品編集 API の実装
   - 価格変更専用 API の実装
   - 商品削除 API の実装
-  - HTTP レスポンスとエラーハンドリングのテスト
+  - HTTP レスポンスとエラーハンドリングのテスト(13テスト全てパス)
   - _Requirements: 1.1-1.6, 2.1-2.4_
 
 - [ ] 4.2 SalesController の実装(TDD)
