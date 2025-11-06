@@ -23,15 +23,15 @@
   - 必要なshadcn/uiコンポーネントをインストール(button, card, form, input, label, badge, dialog, table)
   - _Requirements: 8.1-8.5_
 
-- [ ] 1.4 開発用Docker Compose(PostgreSQL 18のみ)
+- [x] 1.4 開発用Docker Compose(PostgreSQL 16のみ)
   - docker-compose.dev.ymlを作成
-  - PostgreSQL 18サービスを定義
+  - PostgreSQL 16サービスを定義(18から16にダウングレード)
   - データベース名、ユーザー、パスワードを環境変数で設定
   - ポート5432をホストに公開
   - ボリュームマウントでデータ永続化
   - _Requirements: 9.1-9.6_
 
-- [ ] 1.5 Makefileで開発コマンド統一
+- [x] 1.5 Makefileで開発コマンド統一
   - db-upコマンド: docker compose -f docker-compose.dev.yml up -d
   - db-downコマンド: docker compose -f docker-compose.dev.yml down
   - backend-devコマンド: cd backend && uv run uvicorn app.main:app --reload
@@ -42,7 +42,7 @@
   - cleanコマンド: Dockerボリューム削除、キャッシュクリア
   - _Requirements: 全要件の開発効率化_
 
-- [ ] 1.6 データベース接続設定とマイグレーション準備
+- [x] 1.6 データベース接続設定とマイグレーション準備
   - backend/.envファイルのテンプレート作成
   - DATABASE_URL環境変数の設定
   - SQLAlchemyのデータベース接続設定
@@ -50,8 +50,9 @@
   - alembic initでマイグレーション環境を初期化
   - _Requirements: 9.1-9.6_
 
-- [ ] 1.7 PostgreSQLスキーマのマイグレーション実装
-  - Alembicマイグレーションファイルを作成
+- [x] 1.7 PostgreSQLスキーマのマイグレーション実装
+  - SQLAlchemyモデルを作成(Product, SetItem, SalesHistory, SaleItem)
+  - Alembicの自動生成機能でマイグレーションファイルを生成
   - productsテーブルの定義(商品マスタ)
   - set_itemsテーブルの定義(セット構成)
   - sales_historyテーブルの定義(販売履歴)
