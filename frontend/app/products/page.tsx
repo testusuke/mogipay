@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, Trash2, DollarSign } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { apiClient } from "@/lib/api";
 import type { Product, CreateProductRequest } from "@/lib/api/types";
 import { ApiClientError } from "@/lib/api/errors";
@@ -66,13 +66,11 @@ export default function ProductManagement() {
   // Dialog states
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [showPriceDialog, setShowPriceDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Form data
   const [formData, setFormData] = useState<ProductFormData>(initialFormData);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [newPrice, setNewPrice] = useState(0);
 
   // Load products on mount
   useEffect(() => {
@@ -169,33 +167,6 @@ export default function ProductManagement() {
     }
   };
 
-  const handleUpdatePrice = async () => {
-    if (!selectedProduct) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      await apiClient.updateProductPrice(selectedProduct.id, {
-        sale_price: newPrice,
-      });
-
-      await loadProducts();
-      setShowPriceDialog(false);
-      setSelectedProduct(null);
-      setNewPrice(0);
-    } catch (err) {
-      console.error("Failed to update price:", err);
-      if (err instanceof ApiClientError) {
-        setError(err.message);
-      } else {
-        setError("価格の変更に失敗しました");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDeleteProduct = async () => {
     if (!selectedProduct) return;
 
@@ -239,12 +210,6 @@ export default function ProductManagement() {
         })) || [],
     });
     setShowEditDialog(true);
-  };
-
-  const openPriceDialog = (product: Product) => {
-    setSelectedProduct(product);
-    setNewPrice(product.sale_price);
-    setShowPriceDialog(true);
   };
 
   const openDeleteDialog = (product: Product) => {
@@ -332,13 +297,6 @@ export default function ProductManagement() {
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openPriceDialog(product)}
-                      >
-                        <DollarSign className="h-4 w-4" />
-                      </Button>
-                      <Button
                         variant="destructive"
                         size="sm"
                         onClick={() => openDeleteDialog(product)}
@@ -413,7 +371,7 @@ export default function ProductManagement() {
             </div>
             {formData.productType === "single" && (
               <div>
-                <Label htmlFor="initialStock">初期在庫数</Label>
+                <Label htmlFor="initialStock">在庫数</Label>
                 <Input
                   id="initialStock"
                   type="number"
@@ -546,7 +504,7 @@ export default function ProductManagement() {
             </div>
             {formData.productType === "single" && (
               <div>
-                <Label htmlFor="edit-initialStock">初期在庫数</Label>
+                <Label htmlFor="edit-initialStock">在庫数</Label>
                 <Input
                   id="edit-initialStock"
                   type="number"
@@ -614,37 +572,6 @@ export default function ProductManagement() {
             </Button>
             <Button onClick={handleEditProduct} disabled={loading}>
               {loading ? "更新中..." : "更新"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Update Price Dialog */}
-      <Dialog open={showPriceDialog} onOpenChange={setShowPriceDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>価格変更</DialogTitle>
-            <DialogDescription>
-              {selectedProduct?.name}の販売価格を変更します
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="newPrice">新しい販売価格</Label>
-              <Input
-                id="newPrice"
-                type="number"
-                value={newPrice}
-                onChange={(e) => setNewPrice(Number(e.target.value))}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPriceDialog(false)}>
-              キャンセル
-            </Button>
-            <Button onClick={handleUpdatePrice} disabled={loading}>
-              {loading ? "更新中..." : "変更"}
             </Button>
           </DialogFooter>
         </DialogContent>
