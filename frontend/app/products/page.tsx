@@ -448,7 +448,12 @@ export default function ProductManagement() {
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>商品編集</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              商品編集
+              <Badge variant={formData.productType === "set" ? "default" : "secondary"}>
+                {formData.productType === "set" ? "セット" : "単品"}
+              </Badge>
+            </DialogTitle>
             <DialogDescription>商品情報を編集してください</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -459,24 +464,6 @@ export default function ProductManagement() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
-            </div>
-            <div>
-              <Label htmlFor="edit-productType">商品種別</Label>
-              <Select
-                value={formData.productType}
-                disabled
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="single">単品</SelectItem>
-                  <SelectItem value="set">セット</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-sm text-muted-foreground mt-1">
-                ※ 商品種別は変更できません
-              </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
