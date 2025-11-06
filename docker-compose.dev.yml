@@ -1,0 +1,25 @@
+# Development environment Docker Compose configuration
+# This file contains only PostgreSQL 18 for backend development
+
+services:
+  postgres:
+    image: postgres:18
+    container_name: mogipay_postgres_dev
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mogipay_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-mogipay_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mogipay_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mogipay_user} -d ${POSTGRES_DB:-mogipay_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data_dev:
+    name: mogipay_postgres_data_dev
