@@ -118,6 +118,10 @@ class InventoryService:
     ) -> StockCheckResult:
         """Check if requested items are available in stock.
 
+        This method expands set products into their component items and
+        calculates the total required quantity for each single product,
+        then checks if sufficient stock is available.
+
         Args:
             checkout_items: List of dicts with product_id and quantity
             db: Database session
@@ -135,7 +139,9 @@ class InventoryService:
         Invariants:
         - Database state remains unchanged
         """
-        insufficient_items = []
+        # Step 1: Calculate total required quantity for each product
+        # by expanding set products into component items
+        required_quantities = {}  # {product_id: total_quantity}
 
         for item in checkout_items:
             product_id = item["product_id"]
@@ -144,18 +150,37 @@ class InventoryService:
             product = self.product_repo.get_by_id(product_id, db)
 
             if not product:
+                # Product not found
+                return StockCheckResult(
+                    is_available=False,
+                    insufficient_items=[product_id],
+                )
+
+            if product.product_type == "single":
+                # Single product: add to required quantities
+                current_required = required_quantities.get(product_id, 0)
+                required_quantities[product_id] = current_required + requested_quantity
+
+            elif product.product_type == "set":
+                # Set product: expand into component items
+                set_items = self.set_item_repo.get_by_set_product_id(product_id, db)
+                for set_item in set_items:
+                    component_id = set_item.item_product_id
+                    component_quantity = set_item.quantity * requested_quantity
+                    current_required = required_quantities.get(component_id, 0)
+                    required_quantities[component_id] = current_required + component_quantity
+
+        # Step 2: Check if sufficient stock is available for all products
+        insufficient_items = []
+
+        for product_id, required_qty in required_quantities.items():
+            product = self.product_repo.get_by_id(product_id, db)
+            if not product:
                 insufficient_items.append(product_id)
                 continue
 
-            if product.product_type == "single":
-                # Check direct stock
-                if product.current_stock < requested_quantity:
-                    insufficient_items.append(product_id)
-            elif product.product_type == "set":
-                # Calculate set stock from components
-                available_set_stock = self.calculate_set_stock(product_id, db)
-                if available_set_stock < requested_quantity:
-                    insufficient_items.append(product_id)
+            if product.current_stock < required_qty:
+                insufficient_items.append(product_id)
 
         is_available = len(insufficient_items) == 0
 
