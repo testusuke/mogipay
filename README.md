@@ -50,11 +50,18 @@ cp .env.example .env
 | `POSTGRES_PORT` | PostgreSQLポート | `5432` | ✅ |
 | `ENVIRONMENT` | アプリケーション環境 | `development` | ⚠️ |
 | `DEBUG` | デバッグモード（SQL出力） | `True` | ⚠️ |
+| `SECRET_KEY` | JWT署名用シークレットキー | `your-secret-key-here-please-change-in-production` | ✅ |
+| `AUTH_PASSWORD` | 認証用パスワード | `mogipay2024` | ✅ |
+| `ALGORITHM` | JWT署名アルゴリズム | `HS256` | ✅ |
+| `ACCESS_TOKEN_EXPIRE_DAYS` | JWTトークン有効期限（日数） | `7` | ✅ |
 
 **注意事項:**
 - `DATABASE_URL` は他のPostgreSQL環境変数から自動構成されます
 - `DEBUG=True` の場合、SQLクエリがコンソールに出力されます
 - 本番環境では `ENVIRONMENT=production` および `DEBUG=False` に設定してください
+- **セキュリティ重要**: `SECRET_KEY` は本番環境では必ず変更してください（ランダムな文字列を生成推奨）
+- `AUTH_PASSWORD` はログイン時に使用するパスワードです（本番環境では強力なパスワードに変更）
+- JWT トークンは Cookie に保存され、`ACCESS_TOKEN_EXPIRE_DAYS` で指定した日数有効です
 
 ### フロントエンド環境変数
 
@@ -330,8 +337,15 @@ nano .env
 
 必須の環境変数を設定してください：
 
+**データベース:**
 - `POSTGRES_PASSWORD`: 強力なパスワードに変更
 - `DATABASE_URL`: PostgreSQL パスワードを更新
+
+**認証:**
+- `SECRET_KEY`: JWTトークン署名用のランダムな文字列に変更（推奨: `openssl rand -hex 32` で生成）
+- `AUTH_PASSWORD`: ログイン用の強力なパスワードに変更
+
+**インフラ:**
 - `TUNNEL_TOKEN`: Cloudflare Tunnel トークンを設定
 
 #### 2. Cloudflare Tunnel の設定
