@@ -3,11 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth/AuthProvider';
-import { Button } from '@/components/ui/button';
 
 export function Navigation() {
   const pathname = usePathname();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   // Don't show navigation on login page
   if (pathname === '/login') {
@@ -45,11 +44,6 @@ export function Navigation() {
               </div>
             )}
           </div>
-          {isAuthenticated && (
-            <Button variant="outline" onClick={logout} size="sm">
-              ログアウト
-            </Button>
-          )}
         </div>
       </div>
     </nav>
