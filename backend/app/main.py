@@ -41,7 +41,7 @@ app.include_router(inventory_controller.router)
 app.include_router(financial_controller.router)
 
 
-@app.get("/health", status_code=status.HTTP_200_OK)
+@app.get("/api/health", status_code=status.HTTP_200_OK)
 async def health_check():
     """Health check endpoint.
 

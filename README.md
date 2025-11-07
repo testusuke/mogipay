@@ -309,6 +309,195 @@ make migrate        # マイグレーション実行
 make clean          # クリーンアップ(Dockerボリューム削除)
 ```
 
+## 本番環境デプロイ
+
+### 前提条件
+
+- Docker と Docker Compose がインストールされていること
+- Cloudflare アカウントと Tunnel の設定が完了していること
+
+### デプロイ手順
+
+#### 1. 環境変数の設定
+
+```bash
+# .env.example をコピーして .env を作成
+cp .env.example .env
+
+# .env ファイルを編集
+nano .env
+```
+
+必須の環境変数を設定してください：
+
+- `POSTGRES_PASSWORD`: 強力なパスワードに変更
+- `DATABASE_URL`: PostgreSQL パスワードを更新
+- `TUNNEL_TOKEN`: Cloudflare Tunnel トークンを設定
+
+#### 2. Cloudflare Tunnel の設定
+
+1. [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/) にアクセス
+2. "Access" → "Tunnels" から新しい Tunnel を作成
+3. Tunnel トークンを取得して `.env` の `TUNNEL_TOKEN` に設定
+4. Public Hostname を設定:
+   - **フロントエンド**: `mogipay.yourdomain.com` → `http://frontend:3000`
+   - **バックエンドAPI**: `api.mogipay.yourdomain.com` → `http://backend:8000`
+
+#### 3. アプリケーションのビルドと起動
+
+```bash
+# Docker イメージをビルド
+docker compose build
+
+# コンテナを起動（デタッチモード）
+docker compose up -d
+
+# ログを確認
+docker compose logs -f
+```
+
+#### 4. 動作確認
+
+```bash
+# コンテナの状態を確認
+docker compose ps
+
+# ヘルスチェック
+# すべてのコンテナが "healthy" になっていることを確認
+docker compose ps
+
+# バックエンドのヘルスチェック
+curl http://localhost:8000/api/health  # ※ローカルではアクセス不可（Cloudflared経由のみ）
+
+# ブラウザで確認
+# https://mogipay.yourdomain.com にアクセス
+```
+
+### デプロイ後の管理
+
+#### コンテナの管理
+
+```bash
+# コンテナの起動
+docker compose up -d
+
+# コンテナの停止
+docker compose down
+
+# コンテナの再起動
+docker compose restart
+
+# ログの確認
+docker compose logs -f [service-name]
+# 例: docker compose logs -f backend
+```
+
+#### データベースのバックアップ
+
+```bash
+# データベースをバックアップ
+docker compose exec postgres pg_dump -U mogipay_user mogipay_prod > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# バックアップからリストア
+docker compose exec -T postgres psql -U mogipay_user mogipay_prod < backup_file.sql
+```
+
+#### アプリケーションの更新
+
+```bash
+# 1. 最新のコードを取得
+git pull origin main
+
+# 2. イメージを再ビルド
+docker compose build
+
+# 3. コンテナを再起動（ダウンタイムあり）
+docker compose up -d
+
+# 4. 古いイメージを削除
+docker image prune -f
+```
+
+#### マイグレーション実行（本番環境）
+
+マイグレーションは backend コンテナ起動時に自動実行されます。
+手動で実行する場合：
+
+```bash
+# backend コンテナ内でマイグレーション実行
+docker compose exec backend alembic upgrade head
+
+# マイグレーション履歴確認
+docker compose exec backend alembic history
+
+# ロールバック
+docker compose exec backend alembic downgrade -1
+```
+
+### セキュリティ注意事項
+
+1. **環境変数の管理**
+   - `.env` ファイルは絶対にコミットしない
+   - 本番環境では強力なパスワードを使用
+   - 定期的にパスワードをローテーション
+
+2. **Cloudflare Tunnel**
+   - ポートは一切露出させない（全て Cloudflared 経由）
+   - Cloudflare のアクセスポリシーを適切に設定
+   - Tunnel トークンは厳重に管理
+
+3. **Docker コンテナ**
+   - 定期的にイメージを更新
+   - セキュリティアップデートを適用
+   - 不要なコンテナ・イメージを削除
+
+4. **データベース**
+   - 定期的なバックアップを実施
+   - バックアップの暗号化を検討
+   - アクセス制限を適切に設定
+
+### トラブルシューティング
+
+#### コンテナが起動しない
+
+```bash
+# ログを確認
+docker compose logs
+
+# 特定のサービスのログを詳しく確認
+docker compose logs backend
+docker compose logs postgres
+
+# コンテナの状態を確認
+docker compose ps -a
+```
+
+#### データベース接続エラー
+
+```bash
+# PostgreSQL コンテナの状態確認
+docker compose exec postgres pg_isready -U mogipay_user -d mogipay_prod
+
+# 環境変数の確認
+docker compose exec backend env | grep DATABASE_URL
+
+# PostgreSQL のログ確認
+docker compose logs postgres
+```
+
+#### Cloudflare Tunnel が動作しない
+
+```bash
+# cloudflared のログ確認
+docker compose logs cloudflared
+
+# Tunnel トークンの確認
+docker compose exec cloudflared env | grep TUNNEL_TOKEN
+
+# Cloudflare Zero Trust Dashboard で Tunnel の状態を確認
+# https://one.dash.cloudflare.com/
+```
+
 ## ライセンス
 
 MIT License
