@@ -45,11 +45,22 @@ def app_with_db(postgres_container):
         finally:
             db.close()
 
+    # Override authentication for testing
+    def override_get_current_user():
+        """Return a mock user payload for testing."""
+        return {
+            "sub": "test_user",
+            "exp": 9999999999,  # Far future expiration
+        }
+
     # Import app and override dependency
     from app.main import app
+    from app.dependencies.auth import get_current_user
+
     # Clear any existing overrides from other tests
     app.dependency_overrides.clear()
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_current_user] = override_get_current_user
 
     yield app
 

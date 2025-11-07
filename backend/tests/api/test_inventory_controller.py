@@ -22,7 +22,7 @@ def mock_inventory_service():
 
 
 @pytest.fixture
-def client(mock_inventory_service, monkeypatch):
+def client(mock_inventory_service, mock_current_user, monkeypatch):
     """Create FastAPI test client with mocked service.
 
     Note: This will be updated once we create the actual FastAPI app.
@@ -31,12 +31,14 @@ def client(mock_inventory_service, monkeypatch):
     try:
         from app.main import app
         from app.api import inventory_controller
+        from app.dependencies.auth import get_current_user
 
         # Mock the service dependency
         def override_get_inventory_service():
             return mock_inventory_service
 
         app.dependency_overrides[inventory_controller.get_inventory_service] = override_get_inventory_service
+        app.dependency_overrides[get_current_user] = mock_current_user
 
         return TestClient(app)
     except ImportError:

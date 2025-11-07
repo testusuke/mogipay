@@ -28,3 +28,20 @@ def db_session(postgres_container):
     session.close()
     Base.metadata.drop_all(engine)
     engine.dispose()
+
+
+@pytest.fixture
+def mock_current_user():
+    """Create a mock authenticated user for testing.
+
+    Returns a function that can be used to override the get_current_user dependency.
+    """
+
+    def override_get_current_user() -> dict:
+        """Return a mock user payload for testing."""
+        return {
+            "sub": "test_user",
+            "exp": 9999999999,  # Far future expiration
+        }
+
+    return override_get_current_user

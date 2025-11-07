@@ -25,7 +25,7 @@ def mock_product_service():
 
 
 @pytest.fixture
-def client(mock_product_service, monkeypatch):
+def client(mock_product_service, mock_current_user, monkeypatch):
     """Create FastAPI test client with mocked service.
 
     Note: This will be updated once we create the actual FastAPI app.
@@ -35,12 +35,14 @@ def client(mock_product_service, monkeypatch):
     try:
         from app.main import app
         from app.api import product_controller
+        from app.dependencies.auth import get_current_user
 
         # Mock the get_product_service dependency
         def override_get_product_service():
             return mock_product_service
 
         app.dependency_overrides[product_controller.get_product_service] = override_get_product_service
+        app.dependency_overrides[get_current_user] = mock_current_user
 
         return TestClient(app)
     except ImportError:

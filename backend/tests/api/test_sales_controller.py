@@ -38,7 +38,7 @@ def mock_sales_analytics_service():
 
 
 @pytest.fixture
-def client(mock_sales_service, mock_sales_history_service, mock_sales_analytics_service, monkeypatch):
+def client(mock_sales_service, mock_sales_history_service, mock_sales_analytics_service, mock_current_user, monkeypatch):
     """Create FastAPI test client with mocked services.
 
     Note: This will be updated once we create the actual FastAPI app.
@@ -47,6 +47,7 @@ def client(mock_sales_service, mock_sales_history_service, mock_sales_analytics_
     try:
         from app.main import app
         from app.api import sales_controller
+        from app.dependencies.auth import get_current_user
 
         # Mock the service dependencies
         def override_get_sales_service():
@@ -61,6 +62,7 @@ def client(mock_sales_service, mock_sales_history_service, mock_sales_analytics_
         app.dependency_overrides[sales_controller.get_sales_service] = override_get_sales_service
         app.dependency_overrides[sales_controller.get_sales_history_service] = override_get_sales_history_service
         app.dependency_overrides[sales_controller.get_sales_analytics_service] = override_get_sales_analytics_service
+        app.dependency_overrides[get_current_user] = mock_current_user
 
         return TestClient(app)
     except ImportError:
