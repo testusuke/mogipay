@@ -44,6 +44,10 @@ export default function Home() {
   });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [chartDimensions, setChartDimensions] = useState({
+    yAxisWidth: 100,
+    marginLeft: 120,
+  });
 
   /**
    * Fetch dashboard data from API
@@ -67,6 +71,33 @@ export default function Home() {
       setLoading(false);
     }
   };
+
+  /**
+   * Handle window resize for responsive chart dimensions
+   */
+  useEffect(() => {
+    const updateChartDimensions = () => {
+      const width = window.innerWidth;
+      if (width < 640) {
+        // Mobile
+        setChartDimensions({ yAxisWidth: 60, marginLeft: 70 });
+      } else if (width < 1024) {
+        // Tablet
+        setChartDimensions({ yAxisWidth: 80, marginLeft: 90 });
+      } else {
+        // Desktop
+        setChartDimensions({ yAxisWidth: 100, marginLeft: 120 });
+      }
+    };
+
+    // Initial setup
+    updateChartDimensions();
+
+    // Listen to resize events
+    window.addEventListener('resize', updateChartDimensions);
+
+    return () => window.removeEventListener('resize', updateChartDimensions);
+  }, []);
 
   /**
    * Initial data fetch and polling setup
@@ -191,11 +222,20 @@ export default function Home() {
                       total: product.initial_stock,
                     }))}
                   layout="vertical"
-                  margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: chartDimensions.marginLeft,
+                    bottom: 5,
+                  }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={90} />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    width={chartDimensions.yAxisWidth}
+                  />
                   <Tooltip
                     formatter={(value: number, name: string) => {
                       const label =
