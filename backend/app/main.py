@@ -16,6 +16,7 @@ from app.api import (
     auth_controller,
     financial_controller,
     inventory_controller,
+    kitchen_controller,
     product_controller,
     sales_controller,
 )
@@ -46,6 +47,7 @@ app.include_router(product_controller.router)
 app.include_router(sales_controller.router)
 app.include_router(inventory_controller.router)
 app.include_router(financial_controller.router)
+app.include_router(kitchen_controller.router)
 
 
 @app.get("/api/health", status_code=status.HTTP_200_OK)

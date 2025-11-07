@@ -45,3 +45,20 @@ def mock_current_user():
         }
 
     return override_get_current_user
+
+
+@pytest.fixture
+def auth_headers():
+    """Provide mock authentication headers for API testing.
+
+    Returns a dictionary with Authorization header containing a mock JWT token.
+    """
+    return {
+        "Authorization": "Bearer mock_jwt_token_for_testing"
+    }
+
+
+@pytest.fixture
+def db(db_session):
+    """Alias for db_session for backwards compatibility."""
+    return db_session
