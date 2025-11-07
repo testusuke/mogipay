@@ -103,7 +103,9 @@ export class ApiClient {
     const { ApiClientError } = await import('./errors');
 
     try {
-      const errorData: ApiError = await response.json();
+      const responseData = await response.json();
+      // FastAPI wraps error details in a "detail" key
+      const errorData: ApiError = responseData.detail || responseData;
       throw ApiClientError.fromApiError(errorData, response.status);
     } catch (error) {
       // If JSON parsing fails, throw generic error
