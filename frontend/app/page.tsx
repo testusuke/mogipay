@@ -188,15 +188,20 @@ export default function Home() {
                         : 0;
 
                     // Color logic for sales progress
-                    let progressColor = 'bg-gray-300'; // Default: not selling well
+                    let indicatorColor = 'bg-gray-300'; // Default: not selling well
+                    let backgroundColor = 'bg-gray-100'; // Default background
                     if (product.is_out_of_stock) {
-                      progressColor = 'bg-gray-400'; // Sold out
+                      indicatorColor = 'bg-gray-400'; // Sold out
+                      backgroundColor = 'bg-gray-50';
                     } else if (remainingRate <= 20) {
-                      progressColor = 'bg-red-500'; // Critical: Almost sold out
+                      indicatorColor = 'bg-red-500'; // Critical: Almost sold out
+                      backgroundColor = 'bg-red-50';
                     } else if (remainingRate <= 50) {
-                      progressColor = 'bg-yellow-500'; // Warning: Low stock
+                      indicatorColor = 'bg-yellow-500'; // Warning: Low stock
+                      backgroundColor = 'bg-yellow-50';
                     } else if (salesRate >= 30) {
-                      progressColor = 'bg-green-500'; // Good: Selling well
+                      indicatorColor = 'bg-green-500'; // Good: Selling well
+                      backgroundColor = 'bg-green-50';
                     }
 
                     return (
@@ -230,14 +235,17 @@ export default function Home() {
                         <div className="relative">
                           <Progress
                             value={salesRate}
-                            className={`h-6 ${progressColor}`}
+                            className={`h-6 ${backgroundColor}`}
+                            indicatorClassName={indicatorColor}
                           />
                           {/* Remaining stock overlay */}
-                          <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-between px-3 text-xs font-medium text-white">
-                            <span>
+                          <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-between px-3 text-xs font-medium">
+                            <span className="text-white drop-shadow-md">
                               販売済み: {soldCount}個 ({salesRate.toFixed(0)}%)
                             </span>
-                            <span>残り: {product.current_stock}個</span>
+                            <span className="text-gray-700 font-semibold">
+                              残り: {product.current_stock}個
+                            </span>
                           </div>
                         </div>
                       </div>
