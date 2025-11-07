@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth/AuthProvider';
 
@@ -18,8 +19,14 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center space-x-8">
-            <Link href="/" className="text-xl font-bold">
-              MogiPay
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/logo.png"
+                alt="MogiPay"
+                width={40}
+                height={40}
+                priority
+              />
             </Link>
             {isAuthenticated && (
               <div className="flex space-x-4">

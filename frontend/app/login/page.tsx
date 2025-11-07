@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { apiClient } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,9 +37,18 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">MogiPay ログイン</CardTitle>
-          <CardDescription>パスワードを入力してログインしてください</CardDescription>
+        <CardHeader className="space-y-4">
+          <div className="flex justify-center">
+            <Image
+              src="/logo.png"
+              alt="MogiPay Logo"
+              width={120}
+              height={120}
+              priority
+            />
+          </div>
+          <CardTitle className="text-2xl font-bold text-center">MogiPay ログイン</CardTitle>
+          <CardDescription className="text-center">パスワードを入力してログインしてください</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
