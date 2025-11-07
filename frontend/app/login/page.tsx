@@ -21,8 +21,8 @@ export default function LoginPage() {
 
     try {
       await apiClient.login({ password });
-      // Redirect to dashboard on successful login
-      router.push('/dashboard');
+      // ログイン成功後、ルートページにリダイレクト
+      router.push('/');
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
