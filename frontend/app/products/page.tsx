@@ -181,10 +181,17 @@ export default function ProductManagement() {
     } catch (err) {
       console.error("Failed to delete product:", err);
       if (err instanceof ApiClientError) {
-        setError(err.message);
+        // Check if it's a constraint violation error
+        if (err.message.includes("削除できません") || err.message.includes("使用されています")) {
+          setError(`${selectedProduct.name}は削除できません。販売履歴またはセット商品の構成で使用されています。`);
+        } else {
+          setError(err.message);
+        }
       } else {
         setError("商品の削除に失敗しました");
       }
+      // Keep the dialog open to show error
+      setShowDeleteDialog(false);
     } finally {
       setLoading(false);
     }

@@ -13,6 +13,7 @@ from typing import List, Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from app.database import get_db
 from app.services.product_service import (
@@ -339,6 +340,7 @@ def update_price(
     response_model=DeleteProductResponse,
     status_code=status.HTTP_200_OK,
     responses={
+        400: {"model": ErrorResponse},
         404: {"model": ErrorResponse},
     },
 )
@@ -359,23 +361,37 @@ def delete_product(
 
     Raises:
         HTTPException 404: If product not found
+        HTTPException 400: If product cannot be deleted due to foreign key constraints
     """
-    success = product_service.delete_product(product_id, db)
+    try:
+        success = product_service.delete_product(product_id, db)
 
-    if not success:
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error_code": "RESOURCE_NOT_FOUND",
+                    "message": "指定された商品が見つかりません",
+                    "details": {
+                        "resource_type": "product",
+                        "resource_id": str(product_id),
+                    },
+                },
+            )
+
+        return DeleteProductResponse(
+            success=True,
+            message="商品が正常に削除されました"
+        )
+
+    except IntegrityError:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail={
-                "error_code": "RESOURCE_NOT_FOUND",
-                "message": "指定された商品が見つかりません",
+                "error_code": "CONSTRAINT_VIOLATION",
+                "message": "この商品は削除できません",
                 "details": {
-                    "resource_type": "product",
-                    "resource_id": str(product_id),
+                    "reason": "販売履歴またはセット商品の構成で使用されています"
                 },
             },
         )
-
-    return DeleteProductResponse(
-        success=True,
-        message="商品が正常に削除されました"
-    )
