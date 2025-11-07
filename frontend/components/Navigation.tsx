@@ -42,12 +42,6 @@ export function Navigation() {
                 >
                   商品管理
                 </Link>
-                <Link
-                  href="/dashboard"
-                  className="text-sm font-medium transition-colors hover:text-primary"
-                >
-                  ダッシュボード
-                </Link>
               </div>
             )}
           </div>
