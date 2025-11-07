@@ -191,7 +191,6 @@ export default function ProductManagement() {
         setError("商品の削除に失敗しました");
       }
       // Keep the dialog open to show error
-      setShowDeleteDialog(false);
     } finally {
       setLoading(false);
     }
@@ -221,6 +220,7 @@ export default function ProductManagement() {
 
   const openDeleteDialog = (product: Product) => {
     setSelectedProduct(product);
+    setError(null);
     setShowDeleteDialog(true);
   };
 
@@ -634,8 +634,16 @@ export default function ProductManagement() {
               この操作は取り消せません。
             </DialogDescription>
           </DialogHeader>
+          {error && showDeleteDialog && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+            <Button variant="outline" onClick={() => {
+              setShowDeleteDialog(false);
+              setError(null);
+            }}>
               キャンセル
             </Button>
             <Button variant="destructive" onClick={handleDeleteProduct} disabled={loading}>
