@@ -29,6 +29,65 @@
 - **コンテナ**: Docker, Docker Compose
 - **データベース**: PostgreSQL 18
 
+## 環境変数設定
+
+### バックエンド環境変数
+
+バックエンドの環境変数は `backend/.env` ファイルで管理されます。
+
+```bash
+# backend/.env.example をコピーして .env を作成
+cd backend
+cp .env.example .env
+```
+
+| 変数名 | 説明 | デフォルト値 | 必須 |
+|--------|------|--------------|------|
+| `DATABASE_URL` | PostgreSQL接続URL | `postgresql://mogipay_user:mogipay_password@localhost:5432/mogipay_dev` | ✅ |
+| `POSTGRES_DB` | データベース名 | `mogipay_dev` | ✅ |
+| `POSTGRES_USER` | データベースユーザー | `mogipay_user` | ✅ |
+| `POSTGRES_PASSWORD` | データベースパスワード | `mogipay_password` | ✅ |
+| `POSTGRES_PORT` | PostgreSQLポート | `5432` | ✅ |
+| `ENVIRONMENT` | アプリケーション環境 | `development` | ⚠️ |
+| `DEBUG` | デバッグモード（SQL出力） | `True` | ⚠️ |
+
+**注意事項:**
+- `DATABASE_URL` は他のPostgreSQL環境変数から自動構成されます
+- `DEBUG=True` の場合、SQLクエリがコンソールに出力されます
+- 本番環境では `ENVIRONMENT=production` および `DEBUG=False` に設定してください
+
+### フロントエンド環境変数
+
+フロントエンドの環境変数は `frontend/.env.local` ファイルで管理されます。
+
+```bash
+# frontend/.env.local.example をコピーして .env.local を作成
+cd frontend
+cp .env.local.example .env.local
+```
+
+| 変数名 | 説明 | デフォルト値 | 必須 |
+|--------|------|--------------|------|
+| `NEXT_PUBLIC_API_URL` | バックエンドAPIのベースURL | `http://localhost:8000` | ✅ |
+
+**注意事項:**
+- `NEXT_PUBLIC_` プレフィックスはNext.jsでブラウザに公開される環境変数に必要です
+- 本番環境では実際のAPIサーバーのURLに変更してください（例: `https://api.mogipay.example.com`）
+- この変数は `frontend/lib/api/client.ts:295` で使用されます
+
+### Docker Compose環境変数
+
+`docker-compose.dev.yml` では、PostgreSQLコンテナの環境変数として以下が使用されます:
+
+```yaml
+POSTGRES_DB: ${POSTGRES_DB:-mogipay_dev}
+POSTGRES_USER: ${POSTGRES_USER:-mogipay_user}
+POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mogipay_password}
+POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+```
+
+これらは `backend/.env` ファイルから自動的に読み込まれます。
+
 ## 開発手順
 
 ### 初回セットアップ
@@ -38,7 +97,18 @@
 git clone <repository-url>
 cd mogipay
 
-# 2. 初回セットアップコマンド実行
+# 2. 環境変数ファイルを作成
+# バックエンド
+cd backend
+cp .env.example .env
+cd ..
+
+# フロントエンド
+cd frontend
+cp .env.local.example .env.local
+cd ..
+
+# 3. 初回セットアップコマンド実行
 make setup
 # → PostgreSQL起動 + マイグレーション実行 + 依存関係インストール
 ```
