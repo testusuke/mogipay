@@ -31,6 +31,12 @@ export function Navigation() {
                   レジ
                 </Link>
                 <Link
+                  href="/kitchen"
+                  className="text-sm font-medium transition-colors hover:text-primary"
+                >
+                  キッチン
+                </Link>
+                <Link
                   href="/products"
                   className="text-sm font-medium transition-colors hover:text-primary"
                 >

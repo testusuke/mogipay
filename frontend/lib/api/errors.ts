@@ -141,3 +141,23 @@ export class NetworkError extends ApiClientError {
     this.name = 'NetworkError';
   }
 }
+
+/**
+ * Ticket Not Found Error (404)
+ */
+export class TicketNotFoundError extends ApiClientError {
+  constructor(message: string, details?: unknown) {
+    super(message, 404, 'TICKET_NOT_FOUND', details);
+    this.name = 'TicketNotFoundError';
+  }
+}
+
+/**
+ * Ticket Already Completed Error (409)
+ */
+export class TicketAlreadyCompletedError extends ApiClientError {
+  constructor(message: string, details?: unknown) {
+    super(message, 409, 'TICKET_ALREADY_COMPLETED', details);
+    this.name = 'TicketAlreadyCompletedError';
+  }
+}

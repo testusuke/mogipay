@@ -183,3 +183,41 @@ export interface SalesHistoryQueryParams {
 export interface ProductQueryParams {
   product_type?: ProductType;
 }
+
+// =========================================
+// Kitchen Ticket Types
+// =========================================
+
+export interface ComponentItem {
+  name: string;
+  quantity: number;
+}
+
+export interface KitchenTicketItem {
+  product_name: string;
+  product_type: ProductType;
+  quantity: number;
+  components: ComponentItem[] | null;
+}
+
+export interface KitchenTicket {
+  id: string;
+  sale_id: string;
+  order_time: string;
+  elapsed_minutes: number;
+  items: KitchenTicketItem[];
+}
+
+export interface KitchenTicketListResponse {
+  tickets: KitchenTicket[];
+}
+
+export interface CompleteTicketRequest {
+  completed_by: string;
+}
+
+export interface CompleteTicketResponse {
+  ticket_id: string;
+  completed_at: string;
+  completed_by: string;
+}

@@ -23,6 +23,10 @@ import type {
   LoginRequest,
   TokenResponse,
   AuthStatusResponse,
+  // Kitchen Ticket
+  KitchenTicketListResponse,
+  CompleteTicketRequest,
+  CompleteTicketResponse,
   // Error
   ApiError,
 } from './types';
@@ -315,6 +319,30 @@ export class ApiClient {
    */
   async getAuthStatus(): Promise<AuthStatusResponse> {
     return this.get<AuthStatusResponse>('/api/auth/me');
+  }
+
+  // =========================================
+  // Kitchen Ticket API Methods
+  // =========================================
+
+  /**
+   * Get active kitchen tickets
+   */
+  async getKitchenTickets(): Promise<KitchenTicketListResponse> {
+    return this.get<KitchenTicketListResponse>('/api/kitchen/tickets');
+  }
+
+  /**
+   * Complete a kitchen ticket
+   */
+  async completeKitchenTicket(
+    ticketId: string,
+    data: CompleteTicketRequest
+  ): Promise<CompleteTicketResponse> {
+    return this.post<CompleteTicketResponse>(
+      `/api/kitchen/tickets/${ticketId}/complete`,
+      data
+    );
   }
 }
 
