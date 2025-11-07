@@ -11,6 +11,7 @@ from app.repositories.product_repository import ProductRepository
 from app.exceptions import InsufficientStockError
 from app.repositories.sales_history_repository import SalesHistoryRepository
 from app.repositories.set_item_repository import SetItemRepository
+from app.repositories.kitchen_ticket_repository import KitchenTicketRepository
 from app.services.inventory_service import InventoryService
 
 
@@ -58,6 +59,7 @@ class SalesService:
         sales_history_repo: SalesHistoryRepository = None,
         inventory_service: InventoryService = None,
         set_item_repo: SetItemRepository = None,
+        kitchen_ticket_repo: KitchenTicketRepository = None,
     ):
         """Initialize SalesService with repository dependencies.
 
@@ -66,11 +68,13 @@ class SalesService:
             sales_history_repo: SalesHistoryRepository instance
             inventory_service: InventoryService instance
             set_item_repo: SetItemRepository instance
+            kitchen_ticket_repo: KitchenTicketRepository instance
         """
         self.product_repo = product_repo or ProductRepository()
         self.sales_history_repo = sales_history_repo or SalesHistoryRepository()
         self.inventory_service = inventory_service or InventoryService()
         self.set_item_repo = set_item_repo or SetItemRepository()
+        self.kitchen_ticket_repo = kitchen_ticket_repo or KitchenTicketRepository()
 
     def process_checkout(
         self, items: List[CheckoutItem], db: Session
@@ -195,6 +199,9 @@ class SalesService:
                 sale_items_data=sales_items,
                 db=db,
             )
+
+            # Step 5.5: Create kitchen ticket
+            self.kitchen_ticket_repo.create_ticket(sale_id=sale_transaction.id, db=db)
 
             # Step 6: Decrement stock
             for item_detail in item_details:
