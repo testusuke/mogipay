@@ -27,7 +27,7 @@
 
 ### インフラ
 - **コンテナ**: Docker, Docker Compose
-- **データベース**: PostgreSQL 18
+- **データベース**: PostgreSQL 16
 
 ## 環境変数設定
 
