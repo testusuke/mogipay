@@ -3,21 +3,13 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { apiClient } from '@/lib/api';
 import type {
   SalesSummary,
   InventoryStatus,
   FinancialSummary,
 } from '@/lib/api/types';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
 
 /**
  * Dashboard Data Interface
@@ -44,10 +36,6 @@ export default function Home() {
   });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [chartDimensions, setChartDimensions] = useState({
-    yAxisWidth: 100,
-    marginLeft: 120,
-  });
 
   /**
    * Fetch dashboard data from API
@@ -71,33 +59,6 @@ export default function Home() {
       setLoading(false);
     }
   };
-
-  /**
-   * Handle window resize for responsive chart dimensions
-   */
-  useEffect(() => {
-    const updateChartDimensions = () => {
-      const width = window.innerWidth;
-      if (width < 640) {
-        // Mobile
-        setChartDimensions({ yAxisWidth: 60, marginLeft: 70 });
-      } else if (width < 1024) {
-        // Tablet
-        setChartDimensions({ yAxisWidth: 80, marginLeft: 90 });
-      } else {
-        // Desktop
-        setChartDimensions({ yAxisWidth: 100, marginLeft: 120 });
-      }
-    };
-
-    // Initial setup
-    updateChartDimensions();
-
-    // Listen to resize events
-    window.addEventListener('resize', updateChartDimensions);
-
-    return () => window.removeEventListener('resize', updateChartDimensions);
-  }, []);
 
   /**
    * Initial data fetch and polling setup
@@ -211,59 +172,96 @@ export default function Home() {
               <CardTitle>商品別在庫 (単品商品のみ)</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart
-                  data={data.inventory.products
-                    .filter((p) => p.product_type === 'single')
-                    .map((product) => ({
-                      name: product.name,
-                      sold: product.initial_stock - product.current_stock,
-                      remaining: product.current_stock,
-                      total: product.initial_stock,
-                    }))}
-                  layout="vertical"
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: chartDimensions.marginLeft,
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis
-                    dataKey="name"
-                    type="category"
-                    width={chartDimensions.yAxisWidth}
-                  />
-                  <Tooltip
-                    formatter={(value: number, name: string) => {
-                      const label =
-                        name === 'sold'
-                          ? '販売済み'
-                          : name === 'remaining'
-                            ? '残り在庫'
-                            : name;
-                      return [value, label];
-                    }}
-                  />
-                  <Bar dataKey="sold" stackId="a" fill="#ef4444" name="販売済み" />
-                  <Bar
-                    dataKey="remaining"
-                    stackId="a"
-                    fill="#22c55e"
-                    name="残り在庫"
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-              <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="space-y-6">
+                {data.inventory.products
+                  .filter((p) => p.product_type === 'single')
+                  .map((product) => {
+                    const soldCount =
+                      product.initial_stock - product.current_stock;
+                    const salesRate =
+                      product.initial_stock > 0
+                        ? (soldCount / product.initial_stock) * 100
+                        : 0;
+                    const remainingRate =
+                      product.initial_stock > 0
+                        ? (product.current_stock / product.initial_stock) * 100
+                        : 0;
+
+                    // Color logic for sales progress
+                    let progressColor = 'bg-gray-300'; // Default: not selling well
+                    if (product.is_out_of_stock) {
+                      progressColor = 'bg-gray-400'; // Sold out
+                    } else if (remainingRate <= 20) {
+                      progressColor = 'bg-red-500'; // Critical: Almost sold out
+                    } else if (remainingRate <= 50) {
+                      progressColor = 'bg-yellow-500'; // Warning: Low stock
+                    } else if (salesRate >= 30) {
+                      progressColor = 'bg-green-500'; // Good: Selling well
+                    }
+
+                    return (
+                      <div key={product.id} className="space-y-2">
+                        {/* Product name and stock info */}
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{product.name}</span>
+                            {product.is_out_of_stock && (
+                              <Badge variant="destructive" className="text-xs">
+                                完売
+                              </Badge>
+                            )}
+                            {!product.is_out_of_stock && salesRate < 10 && (
+                              <Badge variant="outline" className="text-xs">
+                                要注意
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4 text-muted-foreground">
+                            <span>
+                              販売: {soldCount}/{product.initial_stock}
+                            </span>
+                            <span className="font-medium">
+                              {salesRate.toFixed(0)}%
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Progress bar */}
+                        <div className="relative">
+                          <Progress
+                            value={salesRate}
+                            className={`h-6 ${progressColor}`}
+                          />
+                          {/* Remaining stock overlay */}
+                          <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-between px-3 text-xs font-medium text-white">
+                            <span>
+                              販売済み: {soldCount}個 ({salesRate.toFixed(0)}%)
+                            </span>
+                            <span>残り: {product.current_stock}個</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+
+              {/* Legend */}
+              <div className="mt-6 pt-4 border-t grid grid-cols-2 md:grid-cols-4 gap-3 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-[#ef4444] rounded"></div>
-                  <span>販売済み</span>
+                  <div className="w-4 h-4 bg-red-500 rounded"></div>
+                  <span>残り20%以下</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-[#22c55e] rounded"></div>
-                  <span>残り在庫</span>
+                  <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+                  <span>残り20-50%</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-green-500 rounded"></div>
+                  <span>順調に販売中</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                  <span>販売が少ない</span>
                 </div>
               </div>
             </CardContent>
