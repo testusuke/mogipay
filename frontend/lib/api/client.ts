@@ -19,6 +19,10 @@ import type {
   InventoryStatus,
   // Financial
   FinancialSummary,
+  // Authentication
+  LoginRequest,
+  TokenResponse,
+  AuthStatusResponse,
   // Error
   ApiError,
 } from './types';
@@ -64,6 +68,7 @@ export class ApiClient {
         const response = await fetch(url, {
           ...options,
           signal: controller.signal,
+          credentials: 'include', // Enable cookie handling
           headers: {
             'Content-Type': 'application/json',
             ...options.headers,
@@ -285,6 +290,31 @@ export class ApiClient {
    */
   async getFinancialSummary(): Promise<FinancialSummary> {
     return this.get<FinancialSummary>('/api/financial/summary');
+  }
+
+  // =========================================
+  // Authentication API Methods
+  // =========================================
+
+  /**
+   * Login with password
+   */
+  async login(data: LoginRequest): Promise<TokenResponse> {
+    return this.post<TokenResponse>('/api/auth/login', data);
+  }
+
+  /**
+   * Logout (clear authentication cookie)
+   */
+  async logout(): Promise<{ message: string }> {
+    return this.post<{ message: string }>('/api/auth/logout', {});
+  }
+
+  /**
+   * Get authentication status
+   */
+  async getAuthStatus(): Promise<AuthStatusResponse> {
+    return this.get<AuthStatusResponse>('/api/auth/me');
   }
 }
 

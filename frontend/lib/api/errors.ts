@@ -53,6 +53,26 @@ export class ValidationError extends ApiClientError {
 }
 
 /**
+ * Unauthorized Error (401)
+ */
+export class UnauthorizedError extends ApiClientError {
+  constructor(message: string, details?: unknown) {
+    super(message, 401, 'UNAUTHORIZED', details);
+    this.name = 'UnauthorizedError';
+  }
+}
+
+/**
+ * Forbidden Error (403)
+ */
+export class ForbiddenError extends ApiClientError {
+  constructor(message: string, details?: unknown) {
+    super(message, 403, 'FORBIDDEN', details);
+    this.name = 'ForbiddenError';
+  }
+}
+
+/**
  * Insufficient Stock Error (400)
  */
 export class InsufficientStockError extends ApiClientError {

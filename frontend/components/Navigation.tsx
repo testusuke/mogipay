@@ -1,0 +1,57 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useAuth } from '@/lib/auth/AuthProvider';
+import { Button } from '@/components/ui/button';
+
+export function Navigation() {
+  const pathname = usePathname();
+  const { isAuthenticated, logout } = useAuth();
+
+  // Don't show navigation on login page
+  if (pathname === '/login') {
+    return null;
+  }
+
+  return (
+    <nav className="border-b">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center space-x-8">
+            <Link href="/" className="text-xl font-bold">
+              MogiPay
+            </Link>
+            {isAuthenticated && (
+              <div className="flex space-x-4">
+                <Link
+                  href="/pos"
+                  className="text-sm font-medium transition-colors hover:text-primary"
+                >
+                  レジ
+                </Link>
+                <Link
+                  href="/products"
+                  className="text-sm font-medium transition-colors hover:text-primary"
+                >
+                  商品管理
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium transition-colors hover:text-primary"
+                >
+                  ダッシュボード
+                </Link>
+              </div>
+            )}
+          </div>
+          {isAuthenticated && (
+            <Button variant="outline" onClick={logout} size="sm">
+              ログアウト
+            </Button>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}

@@ -154,6 +154,24 @@ export interface ApiError {
 }
 
 // =========================================
+// Authentication Types
+// =========================================
+
+export interface LoginRequest {
+  password: string;
+}
+
+export interface TokenResponse {
+  access_token: string;
+  token_type: string;
+}
+
+export interface AuthStatusResponse {
+  authenticated: boolean;
+  message: string;
+}
+
+// =========================================
 // Query Parameters
 // =========================================
 
