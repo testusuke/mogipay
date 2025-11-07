@@ -248,6 +248,7 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+!.env.example
 
 # vercel
 .vercel
@@ -273,6 +274,9 @@ tmp/
 *.sw?
 .env
 .env*
+!.env.example
+!backend/.env.example
+!frontend/.env.local.example
 .venv
 env/
 venv/
