@@ -188,15 +188,34 @@ class TestInventoryService:
     ):
         """Test stock check for set product."""
         set_product_id = uuid4()
+        component_product_id = uuid4()
+
         set_product = Product(
             id=set_product_id,
             name="からあげ弁当セット",
             product_type="set",
         )
 
-        # Mock calculate_set_stock to return 5
-        inventory_service.calculate_set_stock = Mock(return_value=5)
-        mock_product_repo.get_by_id.return_value = set_product
+        component_product = Product(
+            id=component_product_id,
+            name="からあげ",
+            product_type="single",
+            current_stock=10,
+        )
+
+        # Mock set items (セット商品のコンポーネント)
+        set_item = SetItem(
+            id=uuid4(),
+            set_product_id=set_product_id,
+            item_product_id=component_product_id,
+            quantity=2,  # Set requires 2 components
+        )
+
+        # Setup mocks
+        mock_product_repo.get_by_id.side_effect = lambda pid, db: (
+            set_product if pid == set_product_id else component_product
+        )
+        mock_set_item_repo.get_by_set_product_id.return_value = [set_item]
 
         checkout_items = [{"product_id": set_product_id, "quantity": 3}]
 

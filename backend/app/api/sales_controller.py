@@ -132,7 +132,7 @@ router = APIRouter(prefix="/api/sales", tags=["sales"])
         422: {"description": "Validation error"},
     },
 )
-async def checkout(
+def checkout(
     request: CheckoutRequest,
     db: Annotated[Session, Depends(get_db)],
     sales_service: Annotated[SalesService, Depends(get_sales_service)],
@@ -204,7 +204,7 @@ async def checkout(
     response_model=List[SaleTransactionResponse],
     status_code=status.HTTP_200_OK,
 )
-async def get_sales_history(
+def get_sales_history(
     db: Annotated[Session, Depends(get_db)],
     sales_history_service: Annotated[SalesHistoryService, Depends(get_sales_history_service)],
     current_user: Annotated[dict, Depends(get_current_user)],
@@ -253,7 +253,7 @@ async def get_sales_history(
     response_model=SalesSummaryResponse,
     status_code=status.HTTP_200_OK,
 )
-async def get_sales_summary(
+def get_sales_summary(
     db: Annotated[Session, Depends(get_db)],
     sales_analytics_service: Annotated[SalesAnalyticsService, Depends(get_sales_analytics_service)],
     current_user: Annotated[dict, Depends(get_current_user)],

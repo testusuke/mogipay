@@ -65,7 +65,7 @@ router = APIRouter(prefix="/api/inventory", tags=["inventory"])
     response_model=InventoryStatusResponse,
     status_code=status.HTTP_200_OK,
 )
-async def get_inventory_status(
+def get_inventory_status(
     db: Annotated[Session, Depends(get_db)],
     inventory_service: Annotated[InventoryService, Depends(get_inventory_service)],
     current_user: Annotated[dict, Depends(get_current_user)],

@@ -135,14 +135,35 @@ class SalesService:
         if not stock_check.is_available:
             # Get first insufficient product details
             first_insufficient_id = stock_check.insufficient_items[0]
-            # Find the requested quantity for this product
-            requested_item = next(i for i in items if str(i.product_id) == str(first_insufficient_id))
             # Get product to check available stock
             product = self.product_repo.get_by_id(first_insufficient_id, db)
 
+            # Find the requested quantity for this product
+            # Note: For set products, the insufficient item might be a component
+            requested_item = next(
+                (i for i in items if str(i.product_id) == str(first_insufficient_id)),
+                None
+            )
+
+            if requested_item:
+                # Direct request for this product
+                requested_quantity = requested_item.quantity
+            else:
+                # This is a component of a set product
+                # Calculate how much was requested by examining set products
+                requested_quantity = 0
+                for item_detail in item_details:
+                    item_product = item_detail["product"]
+                    if item_product.product_type == "set":
+                        # Check if this set contains the insufficient component
+                        set_items = self.set_item_repo.get_by_set_product_id(item_product.id, db)
+                        for set_item in set_items:
+                            if str(set_item.item_product_id) == str(first_insufficient_id):
+                                requested_quantity += set_item.quantity * item_detail["quantity"]
+
             raise InsufficientStockError(
                 product_id=str(first_insufficient_id),
-                requested=requested_item.quantity,
+                requested=requested_quantity,
                 available=product.current_stock if product else 0
             )
 

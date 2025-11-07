@@ -55,7 +55,7 @@ router = APIRouter(prefix="/api/financial", tags=["financial"])
     response_model=FinancialSummaryResponse,
     status_code=status.HTTP_200_OK,
 )
-async def get_financial_summary(
+def get_financial_summary(
     db: Annotated[Session, Depends(get_db)],
     financial_service: Annotated[FinancialService, Depends(get_financial_service)],
     current_user: Annotated[dict, Depends(get_current_user)],
