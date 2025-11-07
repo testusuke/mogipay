@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies.auth import get_current_user
 from app.services.sales_service import SalesService
 from app.services.sales_history_service import SalesHistoryService
 from app.services.sales_analytics_service import SalesAnalyticsService
@@ -135,6 +136,7 @@ async def checkout(
     request: CheckoutRequest,
     db: Annotated[Session, Depends(get_db)],
     sales_service: Annotated[SalesService, Depends(get_sales_service)],
+    current_user: Annotated[dict, Depends(get_current_user)],
 ):
     """Process checkout and create sale transaction.
 
@@ -205,6 +207,7 @@ async def checkout(
 async def get_sales_history(
     db: Annotated[Session, Depends(get_db)],
     sales_history_service: Annotated[SalesHistoryService, Depends(get_sales_history_service)],
+    current_user: Annotated[dict, Depends(get_current_user)],
     date_from: Optional[datetime] = None,
     date_to: Optional[datetime] = None,
 ):
@@ -253,6 +256,7 @@ async def get_sales_history(
 async def get_sales_summary(
     db: Annotated[Session, Depends(get_db)],
     sales_analytics_service: Annotated[SalesAnalyticsService, Depends(get_sales_analytics_service)],
+    current_user: Annotated[dict, Depends(get_current_user)],
 ):
     """Get sales analytics summary.
 

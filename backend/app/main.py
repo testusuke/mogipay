@@ -12,7 +12,13 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import product_controller, sales_controller, inventory_controller, financial_controller
+from app.api import (
+    auth_controller,
+    financial_controller,
+    inventory_controller,
+    product_controller,
+    sales_controller,
+)
 
 # Create FastAPI app
 app = FastAPI(
@@ -35,6 +41,7 @@ app.add_middleware(
 )
 
 # Register routers
+app.include_router(auth_controller.router)
 app.include_router(product_controller.router)
 app.include_router(sales_controller.router)
 app.include_router(inventory_controller.router)

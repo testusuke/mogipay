@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies.auth import get_current_user
 from app.services.inventory_service import InventoryService
 
 
@@ -67,6 +68,7 @@ router = APIRouter(prefix="/api/inventory", tags=["inventory"])
 async def get_inventory_status(
     db: Annotated[Session, Depends(get_db)],
     inventory_service: Annotated[InventoryService, Depends(get_inventory_service)],
+    current_user: Annotated[dict, Depends(get_current_user)],
 ):
     """Get inventory status for all products.
 

@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.database import get_db
+from app.dependencies.auth import get_current_user
 from app.services.product_service import (
     ProductService,
     CreateProductData,
@@ -65,6 +66,7 @@ def create_product(
     request: CreateProductRequest,
     db: Session = Depends(get_db),
     product_service: ProductService = Depends(get_product_service),
+    current_user: dict = Depends(get_current_user),
 ) -> ProductResponse:
     """Create a new product.
 
@@ -134,6 +136,7 @@ def get_all_products(
     db: Session = Depends(get_db),
     product_service: ProductService = Depends(get_product_service),
     inventory_service: InventoryService = Depends(get_inventory_service),
+    current_user: dict = Depends(get_current_user),
 ) -> List[ProductResponse]:
     """Get all products, optionally filtered by type.
 
@@ -177,6 +180,7 @@ def get_product_by_id(
     db: Session = Depends(get_db),
     product_service: ProductService = Depends(get_product_service),
     inventory_service: InventoryService = Depends(get_inventory_service),
+    current_user: dict = Depends(get_current_user),
 ) -> ProductResponse:
     """Get product by ID.
 
@@ -230,6 +234,7 @@ def update_product(
     request: UpdateProductRequest,
     db: Session = Depends(get_db),
     product_service: ProductService = Depends(get_product_service),
+    current_user: dict = Depends(get_current_user),
 ) -> ProductResponse:
     """Update product attributes.
 
@@ -289,6 +294,7 @@ def update_price(
     request: UpdatePriceRequest,
     db: Session = Depends(get_db),
     product_service: ProductService = Depends(get_product_service),
+    current_user: dict = Depends(get_current_user),
 ) -> ProductResponse:
     """Update product price only.
 
@@ -348,6 +354,7 @@ def delete_product(
     product_id: UUID,
     db: Session = Depends(get_db),
     product_service: ProductService = Depends(get_product_service),
+    current_user: dict = Depends(get_current_user),
 ) -> DeleteProductResponse:
     """Delete a product.
 
