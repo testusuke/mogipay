@@ -26,6 +26,7 @@ export function Navigation() {
                 width={40}
                 height={40}
                 priority
+                className="rounded-lg"
               />
             </Link>
             {isAuthenticated && (
