@@ -22,8 +22,11 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set environment variables for build
-# NEXT_PUBLIC_API_URL will be set at runtime via .env
 ENV NODE_ENV=production
+
+# Accept NEXT_PUBLIC_API_URL as build argument
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 # Build Next.js application
 RUN npm run build
